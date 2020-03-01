@@ -8,10 +8,16 @@ It seems today's 24 hour news cycle is filled with headlines highlighting the ef
 Does engagement with scientifically oriented article increase as they become more locally relevant? 
 
 ### High Level Execution
-This experiment will be executed via an online survey on Qualtrics. It will be conducted as follows: 
+This experiment will be executed via an online survey on Qualtrics or Mechanical Turk + Qualtrics. It will be conducted as follows: 
 
 #### Treatment
 Survey respondent is randomly assigned to treatment or control. If in control, the respondent will be asked to read an article with national implications. If in a treatment group, the respondent will be asked to read an article with either state-wide or county-wide implications. 
+
+#### Outcomes
+We'll be running 3 regressions on the following outcome variables: 
+* Reading Comprehension = B0 + B1(local_dummy) + B2(hyper_local_dummy)
+* Credibility = B0 + B1(local_dummy) + B2(hyper_local_dummy)
+* Ugrency = B0 + B1(local_dummy) + B2(hyper_local_dummy)
 
 #### Procedure 
 * Respondent will be asked: 
@@ -27,12 +33,16 @@ Survey respondent is randomly assigned to treatment or control. If in control, t
 | [US air quality is slipping after years of improvement](https://apnews.com/d3515b79af1246d08f7978f026c9092b) | [Air Quality in U.S. – Especially in California – Is Getting Worse](https://cal.streetsblog.org/2019/10/22/new-report-says-air-quality-in-u-s-especially-in-california-is-getting-worse/) | [Metro L.A. hosts nation’s worst cities for air quality, study finds](https://www.presstelegram.com/2020/02/28/metro-l-a-hosts-nations-worst-cities-for-air-quality-study-finds/) | 
 | [America’s Coal Consumption Entered Free Fall in 2019](https://www.theatlantic.com/science/archive/2020/01/americas-coal-consumption-entered-free-fall-2019/604543/) | [Building Electrification Cuts Emissions as Cities Ditch Coal, Gas](https://www.sierraclub.org/sierra/building-electrification-cuts-emissions-cities-ditch-coal-gas) | [Los Angeles will end use of coal-fired power](https://www.reuters.com/article/us-coal-losangeles/los-angeles-will-end-use-of-coal-fired-power-idUSTRE56165X20090702) |
 
-
 #### Blocking
-We intend to block on age, education, and political leaning.
+We intend to block on Age.
+
+#### Covariates
+We intend to include education and political leaning as covariates.
 
 #### Clustering
-We do not forsee a clustered experiment at this time. 
+We do not forsee a clustered experiment at this time.
 
 #### Open Questions 
+* Can we inject treatment based on the respondents locale? I.e. can we show LA respondents LA artciles on the fly?
 * Are you hoping for a grant to help cover expenses of the experiment? If so, make sure to send the instructor a one-page email detailing your grant amount request (up to $500 per group)
+   * Yes, Ask Alex. 
