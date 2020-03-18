@@ -21,3 +21,28 @@ library(lmtest)
 library(sandwich)
 library(stargazer)
 ```
+
+# Abstract 
+
+# Experiment Design
+
+## Hypothesis
+
+## Research Design
+
+## Randomization engineering
+
+## Experimental Materials
+
+## Measurement of variables
+
+## Modeling choices
+
+# Results 
+
+## Summary
+
+## Figures 
+
+## Clean, clear, well articulated relationships between your theory, your hypotheses, the numbers that your models produce, and the figures you present.
+
