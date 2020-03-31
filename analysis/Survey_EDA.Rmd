@@ -21,8 +21,8 @@ library(gridExtra)
 
 
 ```{r}
-d <- fread('speaking_science_data_03-24.csv')
-d
+d <- fread('speaking_science_data_03-24_clean.csv')
+head(d)
 ```
 We have changed the text of questions to simplify things:
 - Statement_1: Please respond to the following statements. - I find this article credible.
