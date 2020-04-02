@@ -2,7 +2,7 @@ Source: LA Times
 
 Port ships are becoming L.A.'s biggest polluters. Will California force a cleanup?
 
-
+ 
 By TONY BARBOZA STAFF WRITER
 
 JAN. 3, 2020
@@ -19,13 +19,11 @@ At stake in the battle are billions of dollars in potential costs at the nation'
 
 But the growth in shipping activity also comes at the cost of people's health across Southern California, especially near the ports. Despite dramatic emissions cuts by the ports in recent years, neighboring communities such as Wilmington, San Pedro and West Long Beach still have the region's highest cancer risk from air pollution and higher rates of asthma compared with the rest of the state.
 
-"Right now we have larger ships carrying more cargo, and they're bringing more pollutants," Golden added. "We understand that cargo has to move and goods have got to be moved. But it should not be at the expense of our health, and at the expense of our children."
-
 It was more than a decade ago when the L.A.-Long Beach ports pioneered a major effort to clean up their operations by phasing out their dirtiest sources of diesel pollution. State regulations over the last six years have forced increasing numbers of container ships, refrigerated cargo ships and cruise ships docked at the largest ports to plug in or to connect to emissions controls. But the rules do not apply to more than half of the 8,000 ocean vessels visiting California each year, according to figures provided by the Air Resources Board.
 
 The Air Resources Board proposes to extend such restrictions to additional ports, ship calls and and vessel types, including tankers and roll-on/roll-off ships, which carry cars, trucks and other vehicles. The rules would increase the number of ship visits subject to the rules from about 43% today to about 71% by 2029, air board figures show.
 
-
+ 
 Largest polluters in L.A.
 
 Some of the vessels at issue are so large they are like floating warehouses or small cities. If not plugged in while docked, they must keep their engines and boilers running. In one 24-hour period in port, a single cruise ship can burn enough fuel oil to equal the pollution from 10,000 cars, according to air quality officials.
@@ -50,18 +48,14 @@ Community groups say they shouldn't have to wait that long for those health bene
 
 "Ships are massive polluters, and they have the most room to improve," said Peter Warren of the San Pedro & Peninsula Homeowners Coalition. "They are also the right target to achieve the greatest gains because their movements are tracked and they can't hide, and there are solutions to make them cleaner."
 
-
+ 
 Who pays?
 
 Environmentalists and community groups in some of the hardest-hit neighborhoods argue the public has long paid for port-related emissions with their health. But the shipping industry has fought against tougher rules, which they argue would be too costly for the amount of pollution reduced.
 
-"We don't think we need a brand-new rule," Mike Jacob, a vice president for the Pacific Merchant Shipping Assn., which represents ocean carriers and marine terminal operators, told state regulators at a hearing in Oakland last month. "We think we need to be making small administrative tweaks to a successful rule and make it even better."
-
 Outfitting one ship with the equipment to plug into shore power costs $1 million or more, according to industry representatives. They argue this price tag isn't cost effective for ships that rarely make stops in California; they say they'll need more shore-based emissions capture systems to comply.
 
 The L.A. and Long Beach ports, which have spent hundreds of millions of dollars building outlets and other electrical infrastructure since they introduced shore power in the mid-2000s, have echoed industry concerns.
-
-Heather Tomley, managing director of planning and environmental affairs for the Port of Long Beach, said the port supported moving forward with additional emissions controls. "But we also need to be realistic about the timeline that it will take for these technologies to develop and be proven, and for the infrastructure to be installed," she said.
 
 The state estimates it would cost industry $2.16 billion over the next decade to comply with the new rules, resulting in health benefits valued at $2.25 billion, including the avoidance of hundreds of early deaths from air pollution. Air Resources Board staff plan to bring the final regulations to the 16-member panel for a final hearing in the spring.
 
@@ -71,11 +65,6 @@ Diane Takvorian, an Air Resources Board member who directs the Environmental Hea
 
 Enforcement wanted
 
-In harbor-area communities, neighborhood groups that want tougher pollution restrictions remain skeptical that new rules will be backed up with tougher enforcement, pointing to a history of noncompliance with ship plug-in requirements at the Port of L.A.
-
 In 2015, the Los Angeles Times revealed that the port had privately rolled back pollution-cutting measures at the China Shipping terminal, giving the company permission to violate shore power requirements starting in 2009. In 2016 the port released an audit showing it also failed to meet pollution-reduction requirements at the TraPac terminal, including mandates that ships plug into shore-based electricity.
 
 Last month, the Air Resources Board announced Shanghai-based shipping giant COSCO Container Lines had paid $965,000 in penalties after a state audit of its fleet's visits to the ports of L.A., Long Beach and Oakland discovered 2,600 violations of the shore power rules from 2014 to 2017.
-
-"This is a resistant industry and it needs policing and auditing," said Warren of the San Pedro & Peninsula Homeowners Coalition. "If you're going to make the rules stricter, you need to make the enforcement stronger too."
-
