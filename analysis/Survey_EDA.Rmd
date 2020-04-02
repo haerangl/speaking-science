@@ -1,0 +1,226 @@
+---
+title: 'Speaking Science Main Survey'
+output: 
+    github_document: default
+knit: (function(inputFile, encoding) {
+  rmarkdown::render(
+    inputFile, encoding = encoding,
+    output_format = c('github_document')) 
+    })
+---
+
+```{r include=FALSE}
+# load packages 
+library(foreign)
+library(data.table)
+library(knitr)
+library(ggplot2)
+library(gridExtra)
+```
+
+
+
+```{r}
+d <- fread('speaking_science_data_03-24_clean.csv')
+head(d)
+```
+We have changed the text of questions to simplify things:
+- Statement_1: Please respond to the following statements. - I find this article credible.
+- Statement_2: Click to write the question text - How important is it to address the pollution issue addressed in the article?
+- Q_1: What is the cost to the shipping industry over the next decade to comply with the new rules? Correct answer is: Over $2 billion
+- Q_2: According to the article, what is *currently* the primary source of smog-forming pollution in the state? Correct answer is: Heavy-duty diesel trucks.
+- Q_3: Which of the following is NOT one of the major negative health outcomes of air pollution as mentioned in the article? Correct answer is: Bronchitis
+- Q_4: Which of the following reasons is NOT a reason why establishing and enforcing a new shore power rules for ships will be difficult? Correct answer is: Plugging a ship into shore power requires many workers and several hours
+- Q_5: Which statement best describes the shipment industry’s attitude toward state regulators' plan to reduce smoke-causing pollutants? Correct answer is: A new and strict regulation may be too costly for the industry.
+- Q_6: According to the article, who currently bears the highest cost of pollution? Correct answer is: Residents who live near the port, in terms of negative health impacts.
+
+Create a subset of the table with the key variables for this first EDA pass:
+
+```{r}
+names = c('Progress', 'Duration (in seconds)', 'Do you live in Los Angeles County?', 'Statement_1', 'Statement_2', 'Q_1', 'Q_2',  'Q_3', 'Q_4', "Q_5", 'Q_6', 'Win_donation', 'Q_TotalDuration', 'city', 'state', 'article' )
+d_1 <- d[, names, with = FALSE]
+d_1
+```
+```{r}
+summary(d_1)
+```
+We have NA values in 4 key columns: "Statement_1", "Statement_2", and "Win_donation". Let's drop the NA lines from the data frame and check it again.
+```{r}
+d_1 <- na.omit(d_1)
+d_1
+```
+
+We see that we dropped 6 entries. Let's replace the correct answers with 1 and the incorrect ones with 0 in the table above. We also create a treatment column with NY-article (control) with 0 and LA-article (treatment) with 1, in the article column.
+
+
+
+```{r}
+d_1$Q_1 <-ifelse(d_1$Q_1 == "Over $2 billion", 1, 0)
+d_1$Q_2 <-ifelse(d_1$Q_2 == "Heavy-duty diesel trucks", 1, 0)
+d_1$Q_3 <-ifelse(d_1$Q_3 == "Bronchitis", 1, 0)
+d_1$Q_4 <-ifelse(d_1$Q_4 == "Plugging a ship into shore power requires many workers and several hours", 1, 0)
+d_1$Q_5 <-ifelse(d_1$Q_5 == "A new and strict regulation may be too costly for the industry.", 1, 0)
+d_1$Q_6 <-ifelse(d_1$Q_6 == "Residents who live near the port, in terms of negative health impacts.", 1, 0)
+d_1$treatment <- ifelse(d_1$article == "Article-LA", 1, 0)
+d_1
+```
+
+
+
+```{r}
+# Most dificult question
+cat("Number of correct answers for question Q_1, is: ", sum(d_1$Q_1), "\n")
+cat("Number of correct answers for question Q_2, is: ", sum(d_1$Q_2),  "\n")
+cat("Number of correct answers for question Q_3, is: ", sum(d_1$Q_3), "\n")
+cat("Number of correct answers for question Q_4, is: ", sum(d_1$Q_4), "\n")
+cat("Number of correct answers for question Q_5, is: ", sum(d_1$Q_5), "\n")
+cat("Number of correct answers for question Q_6, is: ", sum(d_1$Q_6))
+
+```
+
+We can see that Questions 4, 2, and 3 are the most difficult ones is order of difficulty : "Which of the following reasons is NOT a reason why establishing and enforcing a new shore power rules for ships will be difficult? "
+
+
+Let's make a column that sum all the correct answer for a user:
+
+```{r}
+d_1$num_cor_answ <- d_1$Q_1 + d_1$Q_2 + d_1$Q_3 + d_1$Q_4 + d_1$Q_5 + d_1$Q_6
+d_1
+```
+
+```{r}
+boxplot(Q_TotalDuration~num_cor_answ, data=d_1, main="Number of correct answers vs. duration",
+   ylab="Survey duration ", xlab="Number of correct answers out of 6 Qs ", pch=19)
+```
+
+```{r}
+boxplot(Win_donation~num_cor_answ, data=d_1, main="Number of correct answers vs. donation amount",
+   ylab="Donation amount in $ ", xlab="Number of correct answers out of 6 Qs ", pch=19)
+```
+
+
+```{r}
+plot(d_1$Q_TotalDuration, d_1$Win_donation, main="$Donation vs. survey duration",
+   xlab="Survey duration ", ylab="$ Donation ", pch=19)
+```
+
+```{r}
+hist(d_1$Win_donation)
+```
+```{r}
+hist(d_1$Statement_1)
+```
+```{r}
+s1<-ggplot(d_1, aes(x=Statement_1)) + 
+  geom_histogram(binwidth = 1, color="black", fill="white")+
+  scale_x_continuous(breaks=seq(0, 7, 1))+
+  ggtitle("I find the article Credible")
+s1
+
+```
+
+```{r}
+s2<-ggplot(d_1, aes(x=Statement_2)) + 
+  geom_histogram(binwidth = 1, color="black", fill="white")+
+  scale_x_continuous(breaks=seq(0, 7, 1))+
+  ggtitle("I find the issue discussed Important")
+s2
+```
+Let's look at the breakdown of Credibility for the treatmnent and control groups.
+
+
+```{r}
+d_1_control <- d_1[treatment==0]
+d_1_treatment <-d_1[treatment==1]
+```
+
+```{r}
+plot1<- ggplot(d_1_control, aes(x=Statement_1)) + 
+  geom_histogram(binwidth = 1, color="black", fill="white")+
+  xlim(0, 7) +
+  ylim(0, 55)+
+  ggtitle("Importance - Control group")
+
+plot2<- ggplot(d_1_treatment, aes(x=Statement_1)) + 
+  geom_histogram(binwidth = 1, color="black", fill="white")+
+   xlim(0, 7) +
+  ylim(0, 55)+
+  ggtitle("Importance - Treatment group")
+
+grid.arrange(plot1, plot2, ncol=2)
+```
+```{r}
+plot1<- ggplot(d_1_control, aes(x=Statement_2)) + 
+  geom_histogram(binwidth = 1, color="black", fill="white")+
+  xlim(0, 7) +
+  ylim(0, 55)+
+  ggtitle("Credibility - Control group")
+
+plot2<- ggplot(d_1_treatment, aes(x=Statement_2)) + 
+  geom_histogram(binwidth = 1, color="black", fill="white")+
+   xlim(0, 7) +
+  ylim(0, 55)+
+  ggtitle("Credibility - Treatment group")
+
+grid.arrange(plot1, plot2, ncol=2)
+```
+```{r}
+plot1<- ggplot(d_1_control, aes(x=num_cor_answ)) + 
+  geom_histogram(binwidth = 1, color="black", fill="white")+
+  xlim(0, 7) +
+  ylim(0, 30)+
+  ggtitle("Correct answers - Control group")
+
+plot2<- ggplot(d_1_treatment, aes(x=num_cor_answ)) + 
+  geom_histogram(binwidth = 1, color="black", fill="white")+
+   xlim(0, 7) +
+  ylim(0, 30)+
+  ggtitle("Correct answers - Treatment group")
+
+grid.arrange(plot1, plot2, ncol=2)
+```
+
+```{r}
+plot1<- ggplot(d_1_control, aes(x=Win_donation)) + 
+  geom_histogram(bins=10, color="black", fill="white")+
+  ylim(0, 100)+
+  ggtitle("Donation amount - Control group")
+
+plot2<- ggplot(d_1_treatment, aes(x=Win_donation)) + 
+  geom_histogram(bins=10, color="black", fill="white")+
+  ylim(0,100)+
+  ggtitle("Donation amount - Treatment group")
+
+grid.arrange(plot1, plot2, ncol=2)
+```
+
+```{r}
+# Average donation per group
+d_1_control[ , mean(Win_donation)]
+d_1_treatment[ , mean(Win_donation)]
+```
+```{r}
+# Average number of correct answers per group
+d_1_control[ , mean(num_cor_answ)]
+d_1_treatment[ , mean(num_cor_answ)]
+```
+
+
+```{r}
+model_1 = lm(Win_donation ~ Q_TotalDuration, data = d_1)
+summary(model_1)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
