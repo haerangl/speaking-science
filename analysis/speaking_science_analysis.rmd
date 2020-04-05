@@ -27,25 +27,33 @@ d <- fread('speaking_science_data_03-24_clean.csv')
 head(d)
 ```
 
+# TODO: 
+
+1. Discussion on compliance (time read)
+2. Generalizability 
+3. Randomization Inference
+
+
+
 # Functions 
 ```{r, include=FALSE}
 ```
 
+
 # Simple Linear Regression 
 
 ```{r}
-mod <- lm(questions_correct ~ treatment + time_read_article, data=d)
-summary(mod)
+mod <- lm(questions_correct ~ treatment, data=d)
+stargazer(mod, type = "text")
 
 hist(d[treatment == 0, questions_correct,], col=rgb(1,0,0,0.5), breaks=seq(-1,6, by=1))
 hist(d[treatment == 1, questions_correct,], col=rgb(0,0,1,0.5), breaks=seq(-1,6, by=1), add = T)
 box()
-
-stargazer(mod, type = "text")
 ```
 
 
 ```{r}
+#Non parametric test
 mod <- lm(credibility ~ treatment, data=d)
 summary(mod)
 
@@ -57,7 +65,7 @@ box()
 
 ```{r}
 mod <- lm(importance ~ treatment, data=d)
-summary(mod)
+stargazer(mod, type = "text")
 
 hist(d[treatment == 0, importance,], col=rgb(1,0,0,0.5), breaks=seq(1,7, by=1))
 hist(d[treatment == 1, importance,], col=rgb(0,0,1,0.5), breaks=seq(1,7, by=1), add = T)
@@ -77,7 +85,7 @@ lines(d2, col=rgb(0,0,1,0.5))
 ```
 
 ```{r}
-mod <- lm(donation ~ treatment, data=d)
+mod <- lm(donation ~ treatment + time_donation, data=d)
 summary(mod)
 
 d1 <- density(d[treatment == 0, donation,])
@@ -92,8 +100,98 @@ lines(d2, col=rgb(0,0,1,0.5))
 Testing the sharp null hypothesis that the treatment has no effect for anyone. 
 
 ```{r}
-#TODO
+n <- 10000
+
+# Initialize randomization inference 
+ate_questions_correct <- rep(NA, n)
+ate_credibility       <- rep(NA, n)
+ate_importance        <- rep(NA, n)
+ate_time_read_article <- rep(NA, n)
+ate_donation          <- rep(NA, n)
+
+for(i in 1:n){  
+  d_ri <- na.omit(d)
+  d_ri$treatment <- sample(d_ri$treatment)
+  
+  # Is there any way to do this with a loop and col.names(ri)? I hate R...
+  ate_questions_correct[i] <- d_ri[, .('group_mean' = mean(questions_correct)), by=treatment][, diff(group_mean)]
+  ate_credibility[i]       <- d_ri[, .('group_mean' = mean(credibility)),       by=treatment][, diff(group_mean)]
+  ate_importance[i]        <- d_ri[, .('group_mean' = mean(importance)),        by=treatment][, diff(group_mean)]  
+  ate_time_read_article[i] <- d_ri[, .('group_mean' = mean(time_read_article)), by=treatment][, diff(group_mean)]  
+  ate_donation[i]          <- d_ri[, .('group_mean' = mean(donation)),          by=treatment][, diff(group_mean)]  
+  
+}
+
+ri <- data.table(
+  questions_correct = ate_questions_correct,
+  credibility       = ate_credibility,
+  importance        = ate_importance,
+  time_read_article = ate_time_read_article,
+  donation          = ate_donation
+)
 ```
+
+```{r}
+visualize_ri <- function(d, ate) {
+  hist(d, xlim = c(min(d)-0.25, max(d)+0.25))
+  abline(v=ate, col='blue', lwd = 1)
+}
+
+# Actual ATE's
+ate_questions_correct <- d[, .('group_mean' = mean(questions_correct)), by=treatment][, diff(group_mean)]
+ate_credibility       <- d[, .('group_mean' = mean(credibility)),       by=treatment][, diff(group_mean)]
+ate_importance        <- d[, .('group_mean' = mean(importance)),        by=treatment][, diff(group_mean)]  
+ate_time_read_article <- d[, .('group_mean' = mean(time_read_article)), by=treatment][, diff(group_mean)]  
+ate_donation          <- d[, .('group_mean' = mean(donation)),          by=treatment][, diff(group_mean)]  
+
+```
+
+```{r}
+visualize_ri(ri$questions_correct, ate_questions_correct)
+visualize_ri(ri$credibility, ate_credibility)
+visualize_ri(ri$importance, ate_importance)
+visualize_ri(ri$time_read_article, ate_time_read_article)
+visualize_ri(ri$donation, ate_donation)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
