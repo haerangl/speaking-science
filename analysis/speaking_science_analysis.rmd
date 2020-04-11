@@ -20,25 +20,31 @@ library(foreign)
 library(lmtest)
 library(sandwich)
 library(stargazer)
+library(ggplot2)
 ```
 
 ```{r}
-d <- fread('speaking_science_data_03-24_clean.csv')
+read_data <- function(data_file) {
+  d <- fread(data_file, )
+  d <- na.omit(d)
+  
+  d$q1_correct <- as.factor(d$q1_correct)
+  d$q2_correct <- as.factor(d$q2_correct)
+  d$q3_correct <- as.factor(d$q3_correct)
+  d$q4_correct <- as.factor(d$q4_correct)
+  d$q5_correct <- as.factor(d$q5_correct)
+  d$q6_correct <- as.factor(d$q6_correct)
+  d$treatment <- as.factor(d$treatment)
+  
+  return(d)
+}
+
+
+data_file <- 'speaking_science_data_03-24_clean.csv'
+d <- read_data(data_file)
 head(d)
+
 ```
-
-# TODO: 
-
-1. Discussion on compliance (time read)
-2. Generalizability 
-3. Randomization Inference
-
-
-
-# Functions 
-```{r, include=FALSE}
-```
-
 
 # Simple Linear Regression 
 
@@ -84,52 +90,74 @@ plot(d1, col=rgb(1,0,0,0.5))
 lines(d2, col=rgb(0,0,1,0.5))
 ```
 
-```{r}
-mod <- lm(donation ~ treatment + time_donation, data=d)
-summary(mod)
+```{r,  fig.width = 7, fig.height= 3}
+control_mean_donation <- mean(d[treatment == 0, donation])
+treat_mean_donation <- mean(d[treatment == 1, donation])
 
-d1 <- density(d[treatment == 0, donation,])
-d2 <- density(d[treatment == 1, donation,])
-
-plot(d1, col=rgb(1,0,0,0.5))
-lines(d2, col=rgb(0,0,1,0.5))
+ggplot(d, aes(x = donation, fill = treatment)) + 
+  geom_density(alpha = 0.4) +
+  geom_vline(aes(xintercept = control_mean_donation), color = "darkgreen", linetype = "dashed", size = 1) + 
+  geom_vline(aes(xintercept = treat_mean_donation), color = "black", linetype = "dashed", size = 1) +
+  annotate("text", x = 48, y = 0.02, label = paste("Control mean: $", round(control_mean_donation, 2)), color = "darkgreen") + 
+  annotate("text", x = 11, y = 0.02, label = paste("Treatment mean: $", round(treat_mean_donation, 2)), color = "black") + 
+  ggtitle("Density of donation amount for Control and Treatment") + geom_rug() + 
+  ylab("Density") +
+  xlab("Donation ($)")
 ```
+
+```{r}
+wilcox.test(d[treatment == 0, donation], d[treatment == 1, donation])
+wilcox.test(d[treatment == 0, importance], d[treatment == 1, importance])
+wilcox.test(d[treatment == 0, credibility], d[treatment == 1, credibility])
+```
+
 
 # Randomization Inference 
 
 Testing the sharp null hypothesis that the treatment has no effect for anyone. 
 
 ```{r}
-n <- 10000
+# Actual ATE's
+ate_questions_correct <- d[, .('group_mean' = mean(questions_correct)), by=treatment][, diff(group_mean)]
+ate_credibility       <- d[, .('group_mean' = mean(credibility)),       by=treatment][, diff(group_mean)]
+ate_importance        <- d[, .('group_mean' = mean(importance)),        by=treatment][, diff(group_mean)]  
+ate_time_read_article <- d[, .('group_mean' = mean(time_read_article)), by=treatment][, diff(group_mean)]  
+ate_donation          <- d[, .('group_mean' = mean(donation)),          by=treatment][, diff(group_mean)]  
+```
+
+
+```{r}
+n <- 1000  
 
 # Initialize randomization inference 
-ate_questions_correct <- rep(NA, n)
-ate_credibility       <- rep(NA, n)
-ate_importance        <- rep(NA, n)
-ate_time_read_article <- rep(NA, n)
-ate_donation          <- rep(NA, n)
+ri_questions_correct <- rep(NA, n)
+ri_credibility       <- rep(NA, n)
+ri_importance        <- rep(NA, n)
+ri_time_read_article <- rep(NA, n)
+ri_donation          <- rep(NA, n)
 
-for(i in 1:n){  
-  d_ri <- na.omit(d)
+for(i in 1:n){
+  d_ri <- copy(d)
   d_ri$treatment <- sample(d_ri$treatment)
   
   # Is there any way to do this with a loop and col.names(ri)? I hate R...
-  ate_questions_correct[i] <- d_ri[, .('group_mean' = mean(questions_correct)), by=treatment][, diff(group_mean)]
-  ate_credibility[i]       <- d_ri[, .('group_mean' = mean(credibility)),       by=treatment][, diff(group_mean)]
-  ate_importance[i]        <- d_ri[, .('group_mean' = mean(importance)),        by=treatment][, diff(group_mean)]  
-  ate_time_read_article[i] <- d_ri[, .('group_mean' = mean(time_read_article)), by=treatment][, diff(group_mean)]  
-  ate_donation[i]          <- d_ri[, .('group_mean' = mean(donation)),          by=treatment][, diff(group_mean)]  
+  ri_questions_correct[i] <- d_ri[, .('group_mean' = mean(questions_correct)), by=treatment][, diff(group_mean)]
+  ri_credibility[i]       <- d_ri[, .('group_mean' = mean(credibility)),       by=treatment][, diff(group_mean)]
+  ri_importance[i]        <- d_ri[, .('group_mean' = mean(importance)),        by=treatment][, diff(group_mean)]  
+  ri_time_read_article[i] <- d_ri[, .('group_mean' = mean(time_read_article)), by=treatment][, diff(group_mean)]  
+  ri_donation[i]          <- d_ri[, .('group_mean' = mean(donation)),          by=treatment][, diff(group_mean)]  
   
 }
 
 ri <- data.table(
-  questions_correct = ate_questions_correct,
-  credibility       = ate_credibility,
-  importance        = ate_importance,
-  time_read_article = ate_time_read_article,
-  donation          = ate_donation
+  questions_correct = ri_questions_correct,
+  credibility       = ri_credibility,
+  importance        = ri_importance,
+  time_read_article = ri_time_read_article,
+  donation          = ri_donation
 )
 ```
+
 
 ```{r}
 visualize_ri <- function(d, ate) {
@@ -137,54 +165,47 @@ visualize_ri <- function(d, ate) {
   abline(v=ate, col='blue', lwd = 1)
 }
 
-# Actual ATE's
-ate_questions_correct <- d[, .('group_mean' = mean(questions_correct)), by=treatment][, diff(group_mean)]
-ate_credibility       <- d[, .('group_mean' = mean(credibility)),       by=treatment][, diff(group_mean)]
-ate_importance        <- d[, .('group_mean' = mean(importance)),        by=treatment][, diff(group_mean)]  
-ate_time_read_article <- d[, .('group_mean' = mean(time_read_article)), by=treatment][, diff(group_mean)]  
-ate_donation          <- d[, .('group_mean' = mean(donation)),          by=treatment][, diff(group_mean)]  
+visualize_ri(ri$questions_correct, ate_questions_correct)
+visualize_ri(ri$credibility,       ate_credibility)
+visualize_ri(ri$importance,        ate_importance)
+visualize_ri(ri$time_read_article, ate_time_read_article)
+visualize_ri(ri$donation,          ate_donation)
+```
 
+
+# Subgroup testing
+```{r}
+f <- read_data(data_file)
+f <- f[time_read_article > 120, ]
+
+#plot(density(f$time_read_article))
 ```
 
 ```{r}
-visualize_ri(ri$questions_correct, ate_questions_correct)
-visualize_ri(ri$credibility, ate_credibility)
-visualize_ri(ri$importance, ate_importance)
-visualize_ri(ri$time_read_article, ate_time_read_article)
-visualize_ri(ri$donation, ate_donation)
+wilcox.test(f[treatment == 0, importance],  f[treatment == 1, importance])
+wilcox.test(f[treatment == 0, credibility], f[treatment == 1, credibility])
+```
+
+```{r}
+mod <- lm(donation ~ treatment, data=f)
+stargazer(mod, type = "text")
 ```
 
 
+```{r,  fig.width = 7, fig.height= 3}
+control_mean_donation <- mean(f[treatment == 0, donation])
+treat_mean_donation <- mean(f[treatment == 1, donation])
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+ggplot(f, aes(x = donation, fill = treatment)) + 
+  geom_density(alpha = 0.4) +
+  geom_vline(aes(xintercept = control_mean_donation), color = "darkgreen", linetype = "dashed", size = 1) + 
+  geom_vline(aes(xintercept = treat_mean_donation), color = "black", linetype = "dashed", size = 1) +
+  annotate("text", x = 48, y = 0.02, label = paste("Control mean: $", round(control_mean_donation, 2)), color = "darkgreen") + 
+  annotate("text", x = 11, y = 0.02, label = paste("Treatment mean: $", round(treat_mean_donation, 2)), color = "black") + 
+  ggtitle("Density of donation amount for Control and Treatment") + geom_rug() + 
+  ylab("Density") +
+  xlab("Donation ($)")
+```
 
 
 
