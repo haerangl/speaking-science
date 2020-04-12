@@ -117,16 +117,21 @@ mean(d_1[d_1$treatment == 0, donation])
 
 
 ```{r,  fig.width = 7, fig.height= 3}
-ggplot(d_1, aes(x = donation, fill = treatment)) + 
+control_mean_donation <- mean(d[treatment == 0, donation])
+treat_mean_donation <- mean(d[treatment == 1, donation])
+
+ggplot(d, aes(x = donation, fill = treatment)) + 
   geom_density(alpha = 0.4) +
-  geom_vline(aes(xintercept = mean(d_1[d_1$treatment == 0, donation])), color = "darkgreen", linetype = "dashed", size = 1) + 
-  geom_vline(aes(xintercept = mean(d_1[d_1$treatment == 1, donation])), color = "black", linetype = "dashed", size = 1) +
-  annotate("text", x = 48, y = 0.02, label = "Control mean: $31.11", color = "darkgreen") + 
-  annotate("text", x = 11, y = 0.02, label = "Treatm.mean: $27.15", color = "black") + 
+  geom_vline(aes(xintercept = control_mean_donation), color = "darkgreen", linetype = "dashed", size = 1) + 
+  geom_vline(aes(xintercept = treat_mean_donation), color = "black", linetype = "dashed", size = 1) +
+  annotate("text", x = 48, y = 0.02, label = paste("Control mean: $", round(control_mean_donation, 2)), color = "darkgreen") + 
+  annotate("text", x = 11, y = 0.02, label = paste("Treatment mean: $", round(treat_mean_donation, 2)), color = "black") + 
   ggtitle("Density of donation amount for Control and Treatment") + geom_rug() + 
   ylab("Density") +
   xlab("Donation ($)")
 ```
+
+
 ```{r}
 # Kolmogorvo-Smirnov test to check if the distributions of donations between control and treatment differ. Used the bootstrap version since 
 # the distributions are not continuous
@@ -195,6 +200,7 @@ plot2<- ggplot(d_1[d_1$treatment == 1], aes(x=credibility)) +
 grid.arrange(plot1, plot2, ncol=2)
 ```
 ```{r, fig.width = 7, fig.height= 4}
+d_1 <- read_data()  # For some reasons I'm getting an error indicating an issue with the values supplied
 scale_x_continuous()
 
 plot1<- ggplot(d_1[d_1$treatment == 0], aes(x=importance)) + 
@@ -226,7 +232,7 @@ ks.boot(d_1$credibility[d_1$treatment == 0],d_1$credibility[d_1$treatment == 1],
 
 
 ```{r, fig.width = 7, fig.height= 4}
-d_1 <-copy(d)  # For some reasons I'm getting an error indicating an issue with the values supplied
+d_1 <- read_data()  # For some reasons I'm getting an error indicating an issue with the values supplied
 scale_x_discrete()
 
 plot1<- ggplot(d_1[d_1$treatment == 0], aes(x=questions_correct)) + 
@@ -249,9 +255,7 @@ grid.arrange(plot1, plot2, ncol=2)
 
 
 ```{r}
-
 ks.boot(d_1$questions_correct[d_1$treatment == 0],d_1$questions_correct[d_1$treatment == 1], nboots = 100)
-
 ```
 
 
@@ -288,12 +292,12 @@ t.test(d_1$time_read_article[d_1$treatment == 0], d_1$time_read_article[d_1$trea
 
 
 ```{r}
-plot1<- ggplot(d_1_control, aes(x=Win_donation)) + 
+plot1<- ggplot(d_1_control, aes(x=donation)) + 
   geom_histogram(bins=10, color="black", fill="white")+
   ylim(0, 100)+
   ggtitle("Donation amount - Control group")
 
-plot2<- ggplot(d_1_treatment, aes(x=Win_donation)) + 
+plot2<- ggplot(d_1_treatment, aes(x=donation)) + 
   geom_histogram(bins=10, color="black", fill="white")+
   ylim(0,100)+
   ggtitle("Donation amount - Treatment group")
@@ -311,10 +315,6 @@ d <- read_data()
 ```{r}
 mod <- lm(questions_correct ~ treatment, data=d)
 stargazer(mod, type = "text")
-
-hist(d[treatment == 0, questions_correct,], col=rgb(1,0,0,0.5), breaks=seq(-1,6, by=1))
-hist(d[treatment == 1, questions_correct,], col=rgb(0,0,1,0.5), breaks=seq(-1,6, by=1), add = T)
-box()
 ```
 
 
@@ -322,48 +322,18 @@ box()
 #Non parametric test
 mod <- lm(credibility ~ treatment, data=d)
 summary(mod)
-
-hist(d[treatment == 0, credibility,], col=rgb(1,0,0,0.5), breaks=seq(1,7, by=1))
-hist(d[treatment == 1, credibility,], col=rgb(0,0,1,0.5), breaks=seq(1,7, by=1), add = T)
-box()
 ```
 
 
 ```{r}
 mod <- lm(importance ~ treatment, data=d)
 stargazer(mod, type = "text")
-
-hist(d[treatment == 0, importance,], col=rgb(1,0,0,0.5), breaks=seq(1,7, by=1))
-hist(d[treatment == 1, importance,], col=rgb(0,0,1,0.5), breaks=seq(1,7, by=1), add = T)
-box()
 ```
 
 
 ```{r}
 mod <- lm(time_read_article ~ treatment, data=d)
 summary(mod)
-
-d1 <- density(d[treatment == 0, time_read_article,])
-d2 <- density(d[treatment == 1, time_read_article,])
-
-plot(d1, col=rgb(1,0,0,0.5))
-lines(d2, col=rgb(0,0,1,0.5))
-```
-
-
-```{r,  fig.width = 7, fig.height= 3}
-control_mean_donation <- mean(d[treatment == 0, donation])
-treat_mean_donation <- mean(d[treatment == 1, donation])
-
-ggplot(d, aes(x = donation, fill = treatment)) + 
-  geom_density(alpha = 0.4) +
-  geom_vline(aes(xintercept = control_mean_donation), color = "darkgreen", linetype = "dashed", size = 1) + 
-  geom_vline(aes(xintercept = treat_mean_donation), color = "black", linetype = "dashed", size = 1) +
-  annotate("text", x = 48, y = 0.02, label = paste("Control mean: $", round(control_mean_donation, 2)), color = "darkgreen") + 
-  annotate("text", x = 11, y = 0.02, label = paste("Treatment mean: $", round(treat_mean_donation, 2)), color = "black") + 
-  ggtitle("Density of donation amount for Control and Treatment") + geom_rug() + 
-  ylab("Density") +
-  xlab("Donation ($)")
 ```
 
 
@@ -456,7 +426,7 @@ stargazer(mod_1,mod_2,mod_3,mod_4,mod_5,
 
 # Subgroup testing
 ```{r}
-f <- read_data(data_file)
+f <- read_data()
 f <- f[time_read_article > 120, ]
 
 #plot(density(f$time_read_article))
@@ -475,20 +445,6 @@ stargazer(mod, type = "text")
 ```
 
 
-```{r,  fig.width = 7, fig.height= 3}
-control_mean_donation <- mean(f[treatment == 0, donation])
-treat_mean_donation <- mean(f[treatment == 1, donation])
-
-ggplot(f, aes(x = donation, fill = treatment)) + 
-  geom_density(alpha = 0.4) +
-  geom_vline(aes(xintercept = control_mean_donation), color = "darkgreen", linetype = "dashed", size = 1) + 
-  geom_vline(aes(xintercept = treat_mean_donation), color = "black", linetype = "dashed", size = 1) +
-  annotate("text", x = 48, y = 0.02, label = paste("Control mean: $", round(control_mean_donation, 2)), color = "darkgreen") + 
-  annotate("text", x = 11, y = 0.02, label = paste("Treatment mean: $", round(treat_mean_donation, 2)), color = "black") + 
-  ggtitle("Density of donation amount for Control and Treatment") + geom_rug() + 
-  ylab("Density") +
-  xlab("Donation ($)")
-```
 
 
 
