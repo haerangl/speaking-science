@@ -33,6 +33,10 @@ read_data <- function(data_file) {
   }
   
   d <- fread(data_file, )
+  
+  names = c('response_id', 'duration_in_seconds', 'time_read_article', 'credibility', 'importance', 'q1_correct', 'q2_correct', 'q3_correct', 'q4_correct', 'q5_correct', 'q6_correct', 'questions_correct', 'time_answering_questions', 'donation', 'treatment')
+
+  d <- d[, names, with = FALSE]
   d <- na.omit(d)
   
   #d$treatment  <- as.factor(d$treatment)
@@ -46,7 +50,6 @@ read_data <- function(data_file) {
   return(d)
 }
 ```
-
 
 # EDA
 We have changed the text of questions to simplify things:
@@ -117,10 +120,10 @@ mean(d_1[d_1$treatment == 0, donation])
 
 
 ```{r,  fig.width = 7, fig.height= 3}
-control_mean_donation <- mean(d[treatment == 0, donation])
-treat_mean_donation <- mean(d[treatment == 1, donation])
+control_mean_donation <- mean(d_1[treatment == 0, donation])
+treat_mean_donation <- mean(d_1[treatment == 1, donation])
 
-ggplot(d, aes(x = donation, fill = treatment)) + 
+ggplot(d_1, aes(x = donation, fill = treatment)) + 
   geom_density(alpha = 0.4) +
   geom_vline(aes(xintercept = control_mean_donation), color = "darkgreen", linetype = "dashed", size = 1) + 
   geom_vline(aes(xintercept = treat_mean_donation), color = "black", linetype = "dashed", size = 1) +
@@ -427,9 +430,9 @@ stargazer(mod_1,mod_2,mod_3,mod_4,mod_5,
 # Subgroup testing
 ```{r}
 f <- read_data()
-f <- f[time_read_article > 120, ]
+f <- f[time_read_article > 360, ]
 
-#plot(density(f$time_read_article))
+plot(density(f$time_read_article))
 ```
 
 
@@ -440,7 +443,13 @@ wilcox.test(f[treatment == 0, credibility], f[treatment == 1, credibility])
 
 
 ```{r}
-mod <- lm(questions_correct ~ treatment + time_read_article, data=d)
+mod <- lm(questions_correct ~ treatment, data=f)
+stargazer(mod, type = "text")
+```
+
+
+```{r}
+mod <- lm(questions_correct ~ treatment + time_read_article, data=f)
 stargazer(mod, type = "text")
 ```
 
