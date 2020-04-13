@@ -100,10 +100,18 @@ d_1$questions_correct <-as.factor(d_1$questions_correct)
 ggplot(d_1, aes(x = questions_correct, y = donation, color = treatment )) + geom_boxplot()
 ```
 
+```{r}
+ggplot(
+  d_1, aes(x = time_read_article, fill = treatment)) + 
+  geom_density(color = "darkblue", fill = "lightblue") + 
+  ggtitle("Density of Time Reading Article") + geom_rug() + 
+  xlab("Seconds") + 
+  ylab("Density")
+```
+
 
 ```{r}
 ggplot(d_1[treatment ==0], aes(x = donation, fill = treatment)) + geom_density(color = "darkblue", fill = "lightblue") + geom_vline(aes(xintercept = mean(donation)), color = "darkgreen", linetype = "dashed", size = 1) + geom_vline(aes(xintercept = median(donation)), color = "black", linetype = "dashed", size = 1) + xlab("Donation ($)") + annotate("text", x = 42, y = 0.02, label = "Mean: $31.11", color = "darkgreen") + ggtitle("Density of donation amount for Control Group") + geom_rug() + ylab("Density")
-
 ```
 ```{r}
 ggplot(d_1[treatment == 1], aes(x = donation, fill = treatment)) + geom_density(color = "darkgreen", fill = "lightgreen") + geom_vline(aes(xintercept = mean(donation)), color = "darkgreen", linetype = "dashed", size = 1) + geom_vline(aes(xintercept = median(donation)), color = "black", linetype = "dashed", size = 1) + xlab("Donation ($)") + annotate("text", x = 37, y = 0.02, label = "Mean: $27.15", color = "darkgreen") + annotate("text", x = 2, y = 0.02, label = "Median: $10", color = "black") + ggtitle("Density of donation amount for Treatment Group") + geom_rug() + ylab("Density")
@@ -308,6 +316,30 @@ plot2<- ggplot(d_1_treatment, aes(x=donation)) +
 grid.arrange(plot1, plot2, ncol=2)
 ```
 
+
+```{r}
+min_breaks <- c(0, 60, 120, 180, 240, 300, 360, 420, 480, 540, 600, 800)
+
+hist(d_1[, time_read_article], breaks = min_breaks, freq = TRUE, labels = TRUE, 
+     ylim = c(0, 60),
+     xlab = "Time (Seconds)",
+     main = "Time Reading the Article")
+```
+
+```{r}
+
+minutes <- seq(1, 10) * 60
+
+(count(d_1[time_read_article <= minutes[1]])/count(d_1))
+(count(d_1[time_read_article <= minutes[2]])/count(d_1))
+(count(d_1[time_read_article <= minutes[3]])/count(d_1))
+(count(d_1[time_read_article <= minutes[4]])/count(d_1))
+(count(d_1[time_read_article <= minutes[5]])/count(d_1))
+
+
+```
+
+
 # Simple Linear Regression 
 
 ```{r}
@@ -419,11 +451,11 @@ visualize_ri <- function(d, ate, main, xlab, ylab) {
   text(ate, max(h$counts) - (max(h$counts)/10), paste("p = ", p))
 }
 
-visualize_ri(ri$questions_correct, ate_questions_correct, main = "RI of Questions Correct", xlab = "Treatment Effect")
+visualize_ri(ri$questions_correct, ate_questions_correct, main = paste("RI(",length(ri$questions_correct),") of Questions Correct"), xlab = "Treatment Effect")
 #visualize_ri(ri$credibility,       ate_credibility)
 #visualize_ri(ri$importance,        ate_importance)
-visualize_ri(ri$time_read_article, ate_time_read_article, main = "RI of Article Read Time (seconds)", xlab = "Treatment Effect")
-visualize_ri(ri$donation,          ate_donation, main = "RI of Donation in USD", xlab = "Treatment Effect")
+visualize_ri(ri$time_read_article, ate_time_read_article, main = paste("RI(",length(ri$time_read_article),") of Article Read Time (seconds)"), xlab = "Treatment Effect")
+visualize_ri(ri$donation,          ate_donation, main = paste("RI(",length(ri$donation),") of Donation (USD)"), xlab = "Treatment Effect")
 ```
 
 
@@ -440,7 +472,6 @@ stargazer(mod_1,mod_4,mod_5,
           covariate.labels = c("Treatment"),
           omit = c("Constant", "Observations"),
           dep.var.labels = c("Questions Correct", "Article Read Time (seconds)", "Donation in USD"),
-          
           type="html", out="models.html")
 ```
 
@@ -460,9 +491,36 @@ wilcox.test(f[treatment == 0, credibility], f[treatment == 1, credibility])
 ```
 
 
-```{r}
-mod <- lm(questions_correct ~ treatment, data=f)
-stargazer(mod, out = "subgroup_regression.html", type = "html")
+```{r echo=FALSE}
+g <- read_data()
+g$long_read <- g$time_read_article > 120
+
+mod_1 <- lm(questions_correct ~ treatment + long_read, data=g)
+mod_2 <- lm(time_read_article ~ treatment + long_read, data=g)
+mod_3 <- lm(donation ~ treatment +  long_read, data=g)
+
+stargazer(mod_1,mod_2,mod_3, 
+          report = ("vc*p"),
+          title = "Comparing Treatment Effects",
+          covariate.labels = c("Treatment"),
+          omit = c("Constant", "Observations"),
+          dep.var.labels = c("Questions Correct", "Article Read Time (seconds)", "Donation in USD"),
+          type="html", out="subset_regression.html")
+```
+
+
+```{r echo=FALSE}
+
+mod_1 <- lm(questions_correct ~ treatment, data=d)
+mod_2 <- lm(questions_correct ~ treatment + long_read, data=g)
+
+stargazer(mod_1,mod_2, 
+          #report = ("vc*p"),
+          title = "Comparing Treatment Effects",
+          covariate.labels = c("Treatment", "Read time > 120"),
+          omit = c("Constant", "Observations"),
+          dep.var.labels = c("Questions Correct", "Article Read Time (seconds)", "Donation in USD"),
+          type="html", out="subset_regression_side.html")
 ```
 
 
