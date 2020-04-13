@@ -353,16 +353,16 @@ Testing the sharp null hypothesis that the treatment has no effect for anyone.
 
 ```{r}
 # Actual ATE's
-ate_questions_correct <- d[, .('group_mean' = mean(questions_correct)), by=treatment][, diff(group_mean)]
-ate_credibility       <- d[, .('group_mean' = mean(credibility)),       by=treatment][, diff(group_mean)]
-ate_importance        <- d[, .('group_mean' = mean(importance)),        by=treatment][, diff(group_mean)]  
-ate_time_read_article <- d[, .('group_mean' = mean(time_read_article)), by=treatment][, diff(group_mean)]  
-ate_donation          <- d[, .('group_mean' = mean(donation)),          by=treatment][, diff(group_mean)]  
+ate_questions_correct <- d[, .('group_mean' = mean(questions_correct)), by=treatment][order(treatment), diff(group_mean)] 
+ate_credibility       <- d[, .('group_mean' = mean(credibility)),       by=treatment][order(treatment), diff(group_mean)] 
+ate_importance        <- d[, .('group_mean' = mean(importance)),        by=treatment][order(treatment), diff(group_mean)] 
+ate_time_read_article <- d[, .('group_mean' = mean(time_read_article)), by=treatment][order(treatment), diff(group_mean)] 
+ate_donation          <- d[, .('group_mean' = mean(donation)),          by=treatment][order(treatment), diff(group_mean)] 
 ```
 
 
 ```{r}
-n <- 1000  
+n <- 10000
 
 # Initialize randomization inference 
 ri_questions_correct <- rep(NA, n)
@@ -376,11 +376,11 @@ for(i in 1:n){
   d_ri$treatment <- sample(d_ri$treatment)
   
   # Is there any way to do this with a loop and col.names(ri)? I hate R...
-  ri_questions_correct[i] <- d_ri[, .('group_mean' = mean(questions_correct)), by=treatment][, diff(group_mean)]
-  ri_credibility[i]       <- d_ri[, .('group_mean' = mean(credibility)),       by=treatment][, diff(group_mean)]
-  ri_importance[i]        <- d_ri[, .('group_mean' = mean(importance)),        by=treatment][, diff(group_mean)]  
-  ri_time_read_article[i] <- d_ri[, .('group_mean' = mean(time_read_article)), by=treatment][, diff(group_mean)]  
-  ri_donation[i]          <- d_ri[, .('group_mean' = mean(donation)),          by=treatment][, diff(group_mean)]  
+  ri_questions_correct[i] <- d_ri[, .('group_mean' = mean(questions_correct)), by=treatment][order(treatment), diff(group_mean)] 
+  ri_credibility[i]       <- d_ri[, .('group_mean' = mean(credibility)),       by=treatment][order(treatment), diff(group_mean)]
+  ri_importance[i]        <- d_ri[, .('group_mean' = mean(importance)),        by=treatment][order(treatment), diff(group_mean)]   
+  ri_time_read_article[i] <- d_ri[, .('group_mean' = mean(time_read_article)), by=treatment][order(treatment), diff(group_mean)]  
+  ri_donation[i]          <- d_ri[, .('group_mean' = mean(donation)),          by=treatment][order(treatment), diff(group_mean)]  
   
 }
 
@@ -395,33 +395,51 @@ ri <- data.table(
 
 
 ```{r}
-visualize_ri <- function(d, ate) {
-  hist(d, xlim = c(min(d)-0.25, max(d)+0.25))
-  abline(v=ate, col='blue', lwd = 1)
+visualize_ri <- function(d, ate, main, xlab, ylab) {
+  if (missing(main)) { 
+    main <- "Histogram of d"
+  }
+  if (missing(xlab)) { 
+    xlab <- "d"
+  }
+  if (missing(ylab)) { 
+    ylab <- "Frequency"
+  }
+  
+  
+  h <- hist(d, 
+       xlim = c(min(d)-0.25, max(d)+0.25),
+       main = main,
+       xlab = xlab,
+       ylab = ylab
+       )
+  abline(v=ate, col='red', lwd = 1)
+  
+  p <- mean(d >= abs(ate))
+  text(ate, max(h$counts) - (max(h$counts)/10), paste("p = ", p))
 }
 
-visualize_ri(ri$questions_correct, ate_questions_correct)
-visualize_ri(ri$credibility,       ate_credibility)
-visualize_ri(ri$importance,        ate_importance)
-visualize_ri(ri$time_read_article, ate_time_read_article)
-visualize_ri(ri$donation,          ate_donation)
+visualize_ri(ri$questions_correct, ate_questions_correct, main = "RI of Questions Correct", xlab = "Treatment Effect")
+#visualize_ri(ri$credibility,       ate_credibility)
+#visualize_ri(ri$importance,        ate_importance)
+visualize_ri(ri$time_read_article, ate_time_read_article, main = "RI of Article Read Time (seconds)", xlab = "Treatment Effect")
+visualize_ri(ri$donation,          ate_donation, main = "RI of Donation in USD", xlab = "Treatment Effect")
 ```
+
 
 
 # Stargazer 
 ```{r echo=FALSE}
 mod_1 <- lm(questions_correct ~ treatment, data=d)
-mod_2 <- lm(credibility ~ treatment, data=d)
-mod_3 <- lm(importance ~ treatment, data=d)
 mod_4 <- lm(time_read_article ~ treatment, data=d)
 mod_5 <- lm(donation ~ treatment, data=d)
-?stargazer
-stargazer(mod_1,mod_2,mod_3,mod_4,mod_5, 
+
+stargazer(mod_1,mod_4,mod_5, 
           report = ("vc*p"),
           title = "Comparing Treatment Effects",
           covariate.labels = c("Treatment"),
           omit = c("Constant", "Observations"),
-          dep.var.labels = c("Questions Correct", "Credibility", "Importance", "Article Read Time (seconds)", "Donation in USD"),
+          dep.var.labels = c("Questions Correct", "Article Read Time (seconds)", "Donation in USD"),
           
           type="html", out="models.html")
 ```
@@ -430,7 +448,7 @@ stargazer(mod_1,mod_2,mod_3,mod_4,mod_5,
 # Subgroup testing
 ```{r}
 f <- read_data()
-f <- f[time_read_article > 360, ]
+f <- f[time_read_article > 240, ]
 
 plot(density(f$time_read_article))
 ```
@@ -444,7 +462,7 @@ wilcox.test(f[treatment == 0, credibility], f[treatment == 1, credibility])
 
 ```{r}
 mod <- lm(questions_correct ~ treatment, data=f)
-stargazer(mod, type = "text")
+stargazer(mod, out = "subgroup_regression.html", type = "html")
 ```
 
 
