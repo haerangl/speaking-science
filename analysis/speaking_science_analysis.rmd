@@ -446,8 +446,8 @@ visualize_ri <- function(d, ate, main, xlab, ylab) {
        ylab = ylab
        )
   abline(v=ate, col='red', lwd = 1)
-  
-  p <- mean(d >= abs(ate))
+
+  p <- mean(abs(ate) <= d)
   text(ate, max(h$counts) - (max(h$counts)/10), paste("p = ", p))
 }
 
