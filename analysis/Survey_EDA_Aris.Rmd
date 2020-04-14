@@ -1,0 +1,408 @@
+---
+title: 'Speaking Science Main Survey'
+output: 
+    github_document: default
+knit: (function(inputFile, encoding) {
+  rmarkdown::render(
+    inputFile, encoding = encoding,
+    output_format = c('github_document')) 
+    })
+---
+
+
+```{r}
+install.packages("Matching")
+```
+
+```{r include=FALSE}
+# load packages 
+library(foreign)
+library(data.table)
+library(knitr)
+library(ggplot2)
+library(gridExtra)
+library(devtools)
+library(dplyr)
+library(Matching)
+```
+
+
+
+```{r}
+d <- fread('speaking_science_data_03-24_clean.csv')
+d <- d[, ID:= .I]   # adding ID column
+d <-d[,c(38,1:37)]  # Moving ID column to start
+```
+
+
+```{r}
+d
+```
+
+We have changed the text of questions to simplify things:
+- Statement_1: Please respond to the following statements. - I find this article credible.
+- Statement_2: Click to write the question text - How important is it to address the pollution issue addressed in the article?
+- Q_1: What is the cost to the shipping industry over the next decade to comply with the new rules? Correct answer is: Over $2 billion
+- Q_2: According to the article, what is *currently* the primary source of smog-forming pollution in the state? Correct answer is: Heavy-duty diesel trucks.
+- Q_3: Which of the following is NOT one of the major negative health outcomes of air pollution as mentioned in the article? Correct answer is: Bronchitis
+- Q_4: Which of the following reasons is NOT a reason why establishing and enforcing a new shore power rules for ships will be difficult? Correct answer is: Plugging a ship into shore power requires many workers and several hours
+- Q_5: Which statement best describes the shipment industry’s attitude toward state regulators' plan to reduce smoke-causing pollutants? Correct answer is: A new and strict regulation may be too costly for the industry.
+- Q_6: According to the article, who currently bears the highest cost of pollution? Correct answer is: Residents who live near the port, in terms of negative health impacts.
+
+Create a subset of the table with the key variables for this first EDA pass:
+
+```{r}
+names = c('ID', 'duration_in_seconds', 'time_read_article', 'credibility', 'importance', 'q1_correct', 'q2_correct', 'q3_correct',
+          'q4_correct', 'q5_correct', 'q6_correct', 'questions_correct', 'time_answering_questions', 'donation', 'treatment')
+
+d <- d[, names, with = FALSE]
+d
+```
+```{r}
+summary(d)
+```
+
+
+```{r}
+d[!complete.cases(d), ]
+```
+
+
+
+
+We have NA values in 2 in the importance column (IDs: 15 and 123). Let's drop the NA lines from the data frame and check it again.
+```{r}
+d <- na.omit(d)
+d
+```
+
+We see that we dropped the 2 NA entries. 
+
+
+```{r}
+# Most dificult question
+cat("Number of correct answers for question Q_1, is: ", sum(d$q1_correct), "\n")
+cat("Number of correct answers for question Q_2, is: ", sum(d$q2_correct),  "\n")
+cat("Number of correct answers for question Q_3, is: ", sum(d$q3_correct), "\n")
+cat("Number of correct answers for question Q_4, is: ", sum(d$q4_correct), "\n")
+cat("Number of correct answers for question Q_5, is: ", sum(d$q5_correct), "\n")
+cat("Number of correct answers for question Q_6, is: ", sum(d$q6_correct))
+
+```
+
+We can see that Questions 4, 2, and 3 are the most difficult ones is order of difficulty 
+
+
+
+```{r}
+sum(d_1_control$Win_donation < 19)
+```
+
+
+```{r}
+boxplot(duration_in_seconds~questions_correct, data=d, main="Number of correct answers vs. duration",
+   ylab="Survey duration ", xlab="Number of correct answers out of 6 Qs ", pch=19)
+```
+
+
+
+```{r, fig.width = 6, fig.height= 3}
+d_1 <-copy(d)
+
+d_1$questions_correct <-as.factor(d_1$questions_correct)
+ggplot(d_1, aes(x = questions_correct, y = duration_in_seconds, color = treatment )) + geom_boxplot()
+```
+
+
+
+```{r}
+boxplot(donation~questions_correct, data=d_1, main="Number of correct answers vs. donation amount",
+   ylab="Donation amount in $ ", xlab="Number of correct answers out of 6 Qs ", pch=19)
+```
+
+```{r, fig.width = 6, fig.height= 3}
+d_1$treatment <-as.factor(d_1$treatment)
+d_1$questions_correct <-as.factor(d_1$questions_correct)
+ggplot(d_1, aes(x = questions_correct, y = donation, color = treatment )) + geom_boxplot()
+```
+
+
+
+```{r}
+ggplot(d_1[treatment ==0], aes(x = donation, fill = treatment)) + geom_density(color = "darkblue", fill = "lightblue") + geom_vline(aes(xintercept = mean(donation)), color = "darkgreen", linetype = "dashed", size = 1) + geom_vline(aes(xintercept = median(donation)), color = "black", linetype = "dashed", size = 1) + xlab("Donation ($)") + annotate("text", x = 42, y = 0.02, label = "Mean: $31.11", color = "darkgreen") + ggtitle("Density of donation amount for Control Group") + geom_rug() + ylab("Density")
+
+```
+```{r}
+ggplot(d_1[treatment == 1], aes(x = donation, fill = treatment)) + geom_density(color = "darkgreen", fill = "lightgreen") + geom_vline(aes(xintercept = mean(donation)), color = "darkgreen", linetype = "dashed", size = 1) + geom_vline(aes(xintercept = median(donation)), color = "black", linetype = "dashed", size = 1) + xlab("Donation ($)") + annotate("text", x = 37, y = 0.02, label = "Mean: $27.15", color = "darkgreen") + annotate("text", x = 2, y = 0.02, label = "Median: $10", color = "black") + ggtitle("Density of donation amount for Treatment Group") + geom_rug() + ylab("Density")
+
+```
+```{r}
+d_1
+```
+
+
+```{r}
+mean(d_1[d_1$treatment == 0, donation])
+```
+
+
+```{r,  fig.width = 7, fig.height= 3}
+ggplot(d_1, aes(x = donation, fill = treatment)) + 
+  geom_density(alpha = 0.4) +
+  geom_vline(aes(xintercept = mean(d_1[d_1$treatment == 0, donation])), color = "darkgreen", linetype = "dashed", size = 1) + 
+  geom_vline(aes(xintercept = mean(d_1[d_1$treatment == 1, donation])), color = "black", linetype = "dashed", size = 1) +
+  annotate("text", x = 48, y = 0.02, label = "Control mean: $31.11", color = "darkgreen") + 
+  annotate("text", x = 11, y = 0.02, label = "Treatm.mean: $27.15", color = "black") + 
+  ggtitle("Density of donation amount for Control and Treatment") + geom_rug() + 
+  ylab("Density") +
+  xlab("Donation ($)")
+```
+```{r}
+# Kolmogorvo-Smirnov test to check if the distributions of donations between control and treatment differ. Used the bootstrap version since 
+# the distributions are not continuous
+#ks.test(d_1$donation[d_1$treatment == 0],d_1$donation[d_1$treatment == 1])
+ks.boot(d_1$donation[d_1$treatment == 0],d_1$donation[d_1$treatment == 1], nboots = 100)
+```
+
+```{r}
+
+```
+
+
+
+```{r}
+wilcox.test(d_1$donation[d_1$treatment == 0], d_1$donation[d_1$treatment == 1])
+```
+
+
+
+
+```{r}
+plot(d_1$Q_TotalDuration, d_1$Win_donation, main="$Donation vs. survey duration",
+   xlab="Survey duration ", ylab="$ Donation ", pch=19)
+```
+
+```{r}
+hist(d_1$donation)
+```
+
+```{r}
+s1<-ggplot(d_1, aes(x=credibility)) + 
+  geom_histogram(binwidth = 1, color="black", fill="white")+
+  scale_x_continuous(breaks=seq(0, 7, 1))+
+  ggtitle("I find the article Credible")
+s1
+
+```
+
+```{r}
+s2<-ggplot(d_1, aes(x=importance)) + 
+  geom_histogram(binwidth = 1, color="black", fill="white")+
+  scale_x_continuous(breaks=seq(0, 7, 1))+
+  ggtitle("I find the issue discussed Important")
+s2
+```
+Let's look at the breakdown of Credibility for the treatmnent and control groups.
+
+
+
+
+
+```{r, fig.width = 6, fig.height= 3}
+d_1$treatment <-as.factor(d_1$treatment)
+d_1$importance <-as.factor(d_1$importance)
+ggplot(d_1, aes(x = importance, color = treatment )) + geom_boxplot()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+d_1_control <- d_1[treatment==0]
+d_1_treatment <-d_1[treatment==1]
+```
+
+
+```{r, fig.width = 7, fig.height= 4}
+plot1<- ggplot(d_1[d_1$treatment == 0], aes(x=credibility)) + 
+  geom_histogram(binwidth = 1, color="black", fill="white")+
+  stat_bin(binwidth=1, geom="text", aes(label=..count..), vjust=-1.5) +
+  xlim(0, 7.5) +
+  ylim(0, 55)+
+  ggtitle("Credibility - Control group")
+
+plot2<- ggplot(d_1[d_1$treatment == 1], aes(x=credibility)) + 
+  geom_histogram(binwidth = 1, color="black", fill="white")+
+   stat_bin(binwidth=1, geom="text", aes(label=..count..), vjust=-1.5) +
+   xlim(0, 7.5) +
+  ylim(0, 55)+
+  ggtitle("Credibility - Treatment group")
+
+grid.arrange(plot1, plot2, ncol=2)
+```
+```{r, fig.width = 7, fig.height= 4}
+scale_x_continuous()
+
+plot1<- ggplot(d_1[d_1$treatment == 0], aes(x=importance)) + 
+  geom_histogram(binwidth = 1, color="black", fill="white")+
+  stat_bin(binwidth=1, geom="text", aes(label=..count..), vjust=-1.5) +
+  xlim(0, 7.5) +
+  ylim(0, 55)+
+  ggtitle("Importance - Control group")
+
+plot2<- ggplot(d_1[d_1$treatment == 1], aes(x=importance)) + 
+  geom_histogram(binwidth = 1, color="black", fill="white")+
+   stat_bin(binwidth=1, geom="text", aes(label=..count..), vjust=-1.5) +
+   xlim(0, 7.5) +
+  ylim(0, 55)+
+  ggtitle("Importance - Treatment group")
+
+grid.arrange(plot1, plot2, ncol=2)
+```
+
+
+```{r}
+ks.boot(d_1$importance[d_1$treatment == 0],d_1$importance[d_1$treatment == 1], nboots = 1000)
+```
+
+```{r}
+ks.boot(d_1$credibility[d_1$treatment == 0],d_1$credibility[d_1$treatment == 1], nboots = 100)
+```
+
+
+
+
+
+```{r, fig.width = 7, fig.height= 4}
+d_1 <-copy(d)  # For some reasons I'm getting an error indicating an issue with the values supplied
+scale_x_discrete()
+
+plot1<- ggplot(d_1[d_1$treatment == 0], aes(x=questions_correct)) + 
+  geom_histogram(binwidth = 1, color="black", fill="white")+
+  stat_bin(binwidth=1, geom="text", aes(label=..count..), vjust=-1.5) +
+  xlim(0, 7) +
+  ylim(0, 30)+
+  ggtitle("Correct answers - Control group")
+
+
+plot2<- ggplot(d_1[d_1$treatment == 1], aes(x=questions_correct)) + 
+  geom_histogram(binwidth = 1, color="black", fill="white")+
+  stat_bin(binwidth=1, geom="text", aes(label=..count..), vjust=-1.5) +
+  xlim(0, 7) +
+  ylim(0, 30)+
+  ggtitle("Correct answers - Treatment group")
+
+grid.arrange(plot1, plot2, ncol=2)
+```
+
+```{r}
+
+ks.boot(d_1$questions_correct[d_1$treatment == 0],d_1$questions_correct[d_1$treatment == 1], nboots = 100)
+
+```
+
+
+```{r,  fig.width = 7, fig.height= 3}
+d_1$treatment <-as.factor(d_1$treatment)
+
+ggplot(d_1, aes(x = time_read_article, fill = treatment)) + 
+  geom_density(alpha = 0.4) +
+  geom_vline(aes(xintercept = mean(d_1[d_1$treatment == 0, time_read_article])), color = "darkgreen", linetype = "dashed", size = 1) + 
+  geom_vline(aes(xintercept = mean(d_1[d_1$treatment == 1, time_read_article])), color = "black", linetype = "dashed", size = 1) +
+  annotate("text", x = 105, y = 0.0035, label = "Control mean: \n 185.0 s", color = "darkgreen") + 
+  annotate("text", x = 345, y = 0.004, label = "Treatm.mean: 195.9", color = "black") + 
+  ggtitle("Density of time spent reading the article for Control and Treatment") + geom_rug() + 
+  ylab("Density") +
+  xlab("Time reading article (s)")
+```
+
+```{r}
+mean(d_1[d_1$treatment == 0, time_read_article])
+mean(d_1[d_1$treatment == 1, time_read_article])
+```
+
+```{r}
+ks.boot(d_1$time_read_article[d_1$treatment == 0],d_1$time_read_article[d_1$treatment == 1], nboots = 100)
+```
+
+
+```{r}
+# I think the ks.boot test is more appropriate but please confirm
+t.test(d_1$time_read_article[d_1$treatment == 0], d_1$time_read_article[d_1$treatment == 1], alternative = c("two.sided"), mu = 0,  conf.level = 0.95)
+```
+
+
+```{r}
+plot1<- ggplot(d_1_control, aes(x=Win_donation)) + 
+  geom_histogram(bins=10, color="black", fill="white")+
+  ylim(0, 100)+
+  ggtitle("Donation amount - Control group")
+
+plot2<- ggplot(d_1_treatment, aes(x=Win_donation)) + 
+  geom_histogram(bins=10, color="black", fill="white")+
+  ylim(0,100)+
+  ggtitle("Donation amount - Treatment group")
+
+grid.arrange(plot1, plot2, ncol=2)
+```
+
+```{r}
+d_1_treatment
+```
+```{r}
+# Median donation per group
+d_1_control[ , median(Win_donation)]
+d_1_treatment[ , median(Win_donation)]
+```
+
+```{r}
+# Average donation per group
+d_1_control[ , mean(Win_donation)]
+d_1_treatment[ , mean(Win_donation)]
+```
+```{r}
+# Average number of correct answers per group
+d_1_control[ , mean(num_cor_answ)]
+d_1_treatment[ , mean(num_cor_answ)]
+```
+```{r}
+# Average number of survey duration per group
+d_1_control[ , mean(Q_TotalDuration)]
+d_1_treatment[ , mean(Q_TotalDuration)]
+```
+
+```{r}
+model_1 = lm(Win_donation ~ Q_TotalDuration, data = d_1)
+summary(model_1)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
