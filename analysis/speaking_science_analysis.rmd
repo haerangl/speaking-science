@@ -1,10 +1,9 @@
 ---
 title: "Speaking Science"
 subtitle: "W241 Final Project"
-author: "Haerang Lee, Aris F, Mumin Khan"
-date: "March 17th, 2020"
+author: "Aris Fotkatžikis, Haerang Lee, Mumin Khan"
 output:
-  html_document:
+  github_document:
     toc: true
     toc_depth: 3
 ---
@@ -38,14 +37,6 @@ read_data <- function(data_file) {
 
   d <- d[, names, with = FALSE]
   d <- na.omit(d)
-  
-  #d$treatment  <- as.factor(d$treatment)
-  #d$q1_correct <- as.factor(d$q1_correct)
-  #d$q2_correct <- as.factor(d$q2_correct)
-  #d$q3_correct <- as.factor(d$q3_correct)
-  #d$q4_correct <- as.factor(d$q4_correct)
-  #d$q5_correct <- as.factor(d$q5_correct)
-  #d$q6_correct <- as.factor(d$q6_correct)
   
   return(d)
 }
@@ -463,23 +454,23 @@ visualize_ri(ri$donation,          ate_donation, main = paste("RI(",length(ri$do
 # Stargazer 
 ```{r echo=FALSE}
 mod_1 <- lm(questions_correct ~ treatment, data=d)
-mod_4 <- lm(time_read_article ~ treatment, data=d)
-mod_5 <- lm(donation ~ treatment, data=d)
+mod_2 <- lm(time_read_article ~ treatment, data=d)
+mod_3 <- lm(donation ~ treatment, data=d)
 
-stargazer(mod_1,mod_4,mod_5, 
+stargazer(mod_1,mod_2,mod_3, 
           report = ("vc*p"),
           title = "Comparing Treatment Effects",
           covariate.labels = c("Treatment"),
           omit = c("Constant", "Observations"),
           dep.var.labels = c("Questions Correct", "Article Read Time (seconds)", "Donation in USD"),
-          type="html", out="models.html")
+          type="text", out="models.html")
 ```
 
 
 # Subgroup testing
 ```{r}
 f <- read_data()
-f <- f[time_read_article > 240, ]
+f$long_read <- f$time_read_article > 120
 
 plot(density(f$time_read_article))
 ```
@@ -492,12 +483,9 @@ wilcox.test(f[treatment == 0, credibility], f[treatment == 1, credibility])
 
 
 ```{r echo=FALSE}
-g <- read_data()
-g$long_read <- g$time_read_article > 120
-
-mod_1 <- lm(questions_correct ~ treatment + long_read, data=g)
-mod_2 <- lm(time_read_article ~ treatment + long_read, data=g)
-mod_3 <- lm(donation ~ treatment +  long_read, data=g)
+mod_1 <- lm(questions_correct ~ treatment + long_read, data=f)
+mod_2 <- lm(time_read_article ~ treatment + long_read, data=f)
+mod_3 <- lm(donation ~ treatment +  long_read, data=f)
 
 stargazer(mod_1,mod_2,mod_3, 
           report = ("vc*p"),
@@ -505,14 +493,14 @@ stargazer(mod_1,mod_2,mod_3,
           covariate.labels = c("Treatment"),
           omit = c("Constant", "Observations"),
           dep.var.labels = c("Questions Correct", "Article Read Time (seconds)", "Donation in USD"),
-          type="html", out="subset_regression.html")
+          type="text", out="subset_regression.html")
 ```
 
 
 ```{r echo=FALSE}
 
 mod_1 <- lm(questions_correct ~ treatment, data=d)
-mod_2 <- lm(questions_correct ~ treatment + long_read, data=g)
+mod_2 <- lm(questions_correct ~ treatment + long_read, data=f)
 
 stargazer(mod_1,mod_2, 
           #report = ("vc*p"),
@@ -520,7 +508,7 @@ stargazer(mod_1,mod_2,
           covariate.labels = c("Treatment", "Read time > 120"),
           omit = c("Constant", "Observations"),
           dep.var.labels = c("Questions Correct", "Article Read Time (seconds)", "Donation in USD"),
-          type="html", out="subset_regression_side.html")
+          type="text", out="subset_regression_side.html")
 ```
 
 
