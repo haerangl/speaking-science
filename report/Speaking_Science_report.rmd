@@ -47,7 +47,7 @@ A total of 264 people clicked on our survey on Mechanical Turk. 64 people did no
 
 
 ```{r pressure, echo=FALSE, fig.cap="Sankey Diagram of survey data", out.width = '100%'}
-knitr::include_graphics("Sankey_diagram.jpg")
+knitr::include_graphics("resources/sankey_diagram.jpg")
 ```
 Let's import the data for the 196 participants that comprise our treatment and control groups.
 
