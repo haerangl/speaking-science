@@ -52,8 +52,8 @@ knitr::include_graphics("Sankey_diagram.jpg")
 Let's import the data for the 196 participants that comprise our treatment and control groups.
 
 
-```{r}
-d <- read_data("speaking_science_data_03-24_clean.csv")
+```{r, echo=FALSE}
+d <- read_data()
 summary(d)
 ```
 
@@ -85,12 +85,12 @@ We can see that Questions 4, 2, and 3 are the most difficult ones (in order of d
 
 ```{r}
 # Most dificult question
-cat("Number of correct answers for question Q_1, is: ", sum(d_1$Q_1), "\n")
-cat("Number of correct answers for question Q_2, is: ", sum(d_1$Q_2),  "\n")
-cat("Number of correct answers for question Q_3, is: ", sum(d_1$Q_3), "\n")
-cat("Number of correct answers for question Q_4, is: ", sum(d_1$Q_4), "\n")
-cat("Number of correct answers for question Q_5, is: ", sum(d_1$Q_5), "\n")
-cat("Number of correct answers for question Q_6, is: ", sum(d_1$Q_6))
+cat("Number of correct answers for question Q_1, is: ", sum(d$q1_correct), "\n")
+cat("Number of correct answers for question Q_2, is: ", sum(d$q2_correct),  "\n")
+cat("Number of correct answers for question Q_3, is: ", sum(d$q3_correct), "\n")
+cat("Number of correct answers for question Q_4, is: ", sum(d$q4_correct), "\n")
+cat("Number of correct answers for question Q_5, is: ", sum(d$q5_correct), "\n")
+cat("Number of correct answers for question Q_6, is: ", sum(d$q6_correct))
 
 ```
 
@@ -164,3 +164,116 @@ wilcox.test(d$importance[d$treatment == 0], d$importance[d$treatment == 1])
 wilcox.test(d$credibility[d$treatment == 0], d$credibility[d$treatment == 1])
 ```
 
+
+# Results 
+
+## Compliance & Attrition
+For our final results, we've opted to not include observations for those who took fewer than 100 seconds to complete the questions portions of the survey. This is based on a question section length of 340 words and a read and answer composite time of 200 words per minute. The result is a dataset of 111 observations, 61 in control and 50 in treatment. We decided not to filter any of the Article Read Time values because our survey had forced people to stay on the page for 15 seconds. Furthermore, we believe that applying a words read per minute threshold might not be an accurate model of how people interact with journalistic writings, especially those that are scientifically oriented. We had a large number of attritors after the Mechanical Turk task was filled. We believe that this attrited was comprised of another random sampling of the population we sampled while the task was active, thus we have excluded those incomplete responses from this analysis with the belief that the exclusion won't bias our results in any direction.  
+
+```{r, include=FALSE}
+d <- read_data()
+d <- d[time_answering_questions > 100, ]
+(table(d$treatment))
+```
+
+
+
+## Regression Results
+A simple regression of our three outcome variables yields the following table. 
+
+```{r, echo=FALSE, results="asis"}
+mod_1 <- lm(questions_correct ~ treatment, data=d)
+mod_2 <- lm(time_read_article ~ treatment, data=d)
+mod_3 <- lm(donation ~ treatment, data=d)
+
+stargazer(mod_1,mod_2,mod_3, 
+          type="text", # comment out when knitting
+          header = FALSE,
+          report = ("vc*p"),
+          title = "Comparing Treatment Effects",
+          covariate.labels = c("Treatment"),
+          omit = c("Constant", "Observations"),
+          dep.var.labels = c("Questions Correct", "Article Read Time (seconds)", "Donation in USD")
+          )
+```
+
+As shown, we observed a treatment effect of `r round(mod_1$coefficients[[2]], 4)` with a p-value of `r round(anova(mod_1)$'Pr(>F)'[1], 4)` for the number of questions the survey taker answered correctly when treated. This hints that respondents who received the local (Los Angeles) article paid more attention to its contents and were able to recall information better on the quiz. Unfortunately, the same cannot be said about our Article Read Time outcome variable (ATE = `r round(mod_2$coefficients[[2]], 4)`, p=`r round(anova(mod_2)$'Pr(>F)'[1], 4)`) or our Donation ammount outcome variable (ATE = `r round(mod_3$coefficients[[2]], 4)`, p=`r round(anova(mod_3)$'Pr(>F)'[1], 4)`).
+
+When considering the effect of treatment on the number of questions a respondent answered correctly, we wanted to make sure there were no unobserved confounds contributing to the effect. After running serveral analysis, the only significant covariate we found was Article read time. Taking Article Read Time into account yields the regression below. 
+
+```{r, echo=FALSE, results="asis"}
+mod_1 <- lm(questions_correct ~ treatment + time_read_article, data=d)
+
+stargazer(mod_1,
+          type="text", # comment out when knitting
+          header = FALSE,
+          report = ("vc*p"),
+          title = "Comparing Treatment Effects",
+          covariate.labels = c("Treatment", "Article Read Time (seconds)"),
+          omit = c("Constant", "Observations"),
+          dep.var.labels = c("Questions Correct")
+)
+```
+
+The table does show a small effect of Article Read Time on the Questions Correct outcome variable, but the treatment effect is still there at `r round(mod_1$coefficients[[2]], 4)` and is still statistically significant at the 95% conficence level (p = `r round(anova(mod_1)$'Pr(>F)'[1], 4)`).
+
+We were not able to measure a statistically signigcant effect from either Article Time Read or Donation Ammount outcome variables. To see if we were asking the right questions, we created a binned catagory of Article Read Times for each minute and a dummy variable to represent whether or not the respondent donated. As you can see from the table below, the results are inconclusive. Log transformations of both did not help. 
+
+```{r, echo=FALSE, results="asis"}
+d$donator <- ifelse(d$donation > 0, 1, 0)
+d$time_read_article_bins <- d$time_read_article %/% 60
+
+mod_1 <- lm(time_read_article_bins ~ treatment, data=d)
+mod_2 <- lm(donator ~ treatment, data=d)
+
+stargazer(mod_1, mod_2,
+          type="text", # comment out when knitting
+          header = FALSE,
+          #report = ("vc*p"),
+          title = "Comparing Treatment Effects",
+          covariate.labels = c("Treatment"),
+          omit = c("Constant", "Observations"),
+          dep.var.labels = c("Article Read Time (1 Minute bins)", "Donation > 0")
+)
+```
+
+# Compliance
+
+A surprising finding of our survey was how little time was spent reading the article. We had initially anticipated a normal or normal-esque shaped distribution of reading times around the 2 minute mark. Instead, we observed a highly right-skewed distribution of article read times. 
+
+```{r}
+d$treatment_factor <-as.factor(d$treatment)
+
+mean_control_time <- round(mean(d[d$treatment_factor == 0, time_read_article]), 2)
+mean_treatment_time <- round(mean(d[d$treatment_factor == 1, time_read_article]), 2)
+
+
+ggplot(d, aes(x = time_read_article, fill = treatment_factor)) + 
+  # geom_density(alpha = 0.4) +
+  geom_histogram(position="dodge", binwidth=30)+
+  geom_vline(aes(xintercept = mean_control_time), color = "darkgreen", linetype = "dashed", size = 1) + 
+  geom_vline(aes(xintercept = mean_treatment_time), color = "black", linetype = "dashed", size = 1) +
+  annotate("text", x = mean_control_time - 20, y = 12, label = paste("Control mean: \n ", mean_control_time), color = "darkgreen", hjust="right") + 
+  annotate("text", x = mean_treatment_time + 20, y = 12, label = paste("Treatment mean: \n ", mean_treatment_time), color = "black", hjust="left") + 
+  ggtitle("Histogram of Reading Time (Seconds)") + geom_rug() + 
+  ylab("Frequency") +
+  xlab("Reading Time (s)")+
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_blank(),
+    panel.background = element_blank())
+```
+
+# Generalizability 
+
+## Science Communication is Broad
+
+
+## Comprehension is Difficult to Quantify
+
+
+## Competing Incentives with Mechanical Turk
+
+
+# Conclusion
