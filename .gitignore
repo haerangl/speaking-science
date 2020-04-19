@@ -37,4 +37,5 @@ rsconnect/
 *.tex
 *.Rproj
 
+*.DS_Store
 *.ini
