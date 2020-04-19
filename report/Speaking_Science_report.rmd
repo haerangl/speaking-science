@@ -1,0 +1,44 @@
+---
+title: "Speaking Science"
+subtitle: "W241 Final Project"
+author: "Aris Fotkatžikis, Haerang Lee, Mumin Khan"
+output:
+  pdf_document: 
+    toc: true
+    toc_depth: 3
+  github_document:
+    toc: true
+    toc_depth: 3
+---
+
+```{r, include=FALSE} 
+# load packages 
+library(data.table)
+library(devtools)
+library(dplyr)
+library(foreign)
+library(ggplot2)
+library(gridExtra)
+library(knitr)
+library(lmtest)
+library(Matching)
+library(sandwich)
+library(stargazer)
+```
+
+```{r, include=FALSE}
+read_data <- function(data_file) {
+  if(missing(data_file)) {
+    data_file <- 'speaking_science_data_03-24_clean.csv'
+  }
+  
+  d <- fread(data_file, )
+  
+  names = c('response_id', 'duration_in_seconds', 'time_read_article', 'credibility', 'importance', 'q1_correct', 'q2_correct', 'q3_correct', 'q4_correct', 'q5_correct', 'q6_correct', 'questions_correct', 'time_answering_questions', 'donation', 'treatment')
+
+  d <- d[, names, with = FALSE]
+  d <- na.omit(d)
+  
+  return(d)
+}
+```
