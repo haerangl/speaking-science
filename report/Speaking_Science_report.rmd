@@ -29,7 +29,7 @@ library(stargazer)
 ```{r, include=FALSE}
 read_data <- function(data_file) {
   if(missing(data_file)) {
-    data_file <- 'speaking_science_data_03-24_clean.csv'
+    data_file <- '../data/speaking_science_data_03-24_clean.csv'
   }
   
   d <- fread(data_file, )
