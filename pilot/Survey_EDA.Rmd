@@ -21,7 +21,7 @@ library(gridExtra)
 
 
 ```{r}
-d <- fread('pilot.csv')
+d <- fread('../data/pilot.csv')
 head(d)
 ```
 We have changed the text of questions to simplify things:
