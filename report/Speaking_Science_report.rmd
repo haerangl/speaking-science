@@ -60,7 +60,7 @@ summary(d)
 We see that there are no missing values and nothing appears out of order. We examined many aspects of our data. In this EDA portion of our report, we will only highlight key aspects of our data, to adhere to the 20 page limitation. To ensure that we could use the quiz questions to assess how engaged our survey takers were, we selected relatively dificult questions. As we can see from the summary table above, nobody got all 6 questions correct. The distribution of the number of correct answers is shown below.This distribution is quite similar to the one we expected based on our pilot study (**WE NEED TO ADD GRAPHS OR REFER TO HAERANG'S SECTION HERE **)
 
 
-```{r,  fig.width = 7, fig.height= 3.5}
+```{r,  fig.width = 7, fig.height= 3.5, echo=FALSE}
 # Average number of correct answers per group
 d[d$treatment == 0][ , mean(questions_correct)]
 d[d$treatment == 1][ , mean(questions_correct)]
@@ -83,7 +83,7 @@ ggplot(d, aes(x = questions_correct, fill = factor(treatment))) +
 ```
 We can see that Questions 4, 2, and 3 are the most difficult ones (in order of difficulty) and only 3 out of 6 questions had over 50% correct answers.
 
-```{r}
+```{r, echo=FALSE}
 # Most dificult question
 cat("Number of correct answers for question Q_1, is: ", sum(d$q1_correct), "\n")
 cat("Number of correct answers for question Q_2, is: ", sum(d$q2_correct),  "\n")
@@ -96,7 +96,7 @@ cat("Number of correct answers for question Q_6, is: ", sum(d$q6_correct))
 
 We also check the distribution of reading times for treatment and control. We can see in the graphs below that they don't follow a normal distribution. In addition, the actual distribution of donation amounts, seems to have a much smaller difference between treatment and control than either one of our assumed distributions, based on our pilot study (**WE NEED TO ADD GRAPHS OR REFER TO HAERANG'S SECTION HERE **). Our power analysis indicated that we needed more than 600 observations, but we only had 194. For an even smaller treatment effect, maybe we needed an even greater sample size. So we're not confident we will detect any treatment effects here. 
 
-```{r}
+```{r, echo=FALSE}
 ggplot(d, aes(x = time_read_article, fill = factor(treatment))) + 
   # geom_density(alpha = 0.4) +
   geom_histogram(position="dodge", binwidth=30)+
@@ -116,7 +116,7 @@ ggplot(d, aes(x = time_read_article, fill = factor(treatment))) +
 
 Let's check below the distribution of the survey duration and the distribution of the doonation with the quiz score (i.e. some of correct answers per survey taker). On the left we are showing the distribution of time spent reading the article with the number of correct answers. It is not surprising that in general the longer someone spent reading the article, the better they did on the quiz. This holds for treatment and control. The graph on the right, shows the distribution of the amount donated with the number of correct answers. It seems that the more correct answers a person had, the less amount of money they donated. This holds both for treatment and control. That might be an indication that the more effort people put in reading and answering the questions, the less they were inclined to donate their hard earned money.
 
-```{r, fig.width = 10, fig.height= 3}
+```{r, fig.width = 10, fig.height= 3, echo=FALSE}
 a <- ggplot(d, aes(x = as.factor(questions_correct), y = duration_in_seconds, color = factor(treatment) )) + geom_boxplot() + ylab("Duration (s)") +
   xlab("Quiz score")
 b <- ggplot(d, aes(x = factor(questions_correct), y = donation, color = factor(treatment) )) + geom_boxplot() + ylab("Donation ($)") +
@@ -129,7 +129,7 @@ grid.arrange(a, b, ncol = 2)
 We asked survey takers to rate the Importance of the topic discussed in the article and also rate their perceived Credibility of the article on a scale from 1 to 7. Plotting the distributions of the Importance and Credibility variables, we see on the right that the credibility ratings were rather similar for both treatment and control. On the left we see that the treatment group tends to assign higher Importance scores compared to control, and this difference is statistically significant at the 0.05 level, in accordance with our hypothesis.
 
 
-```{r,fig.width = 10, fig.height= 3}
+```{r,fig.width = 10, fig.height= 3, echo=FALSE}
 plot1 <- ggplot(d, aes(x = importance, fill = factor(treatment))) + 
   # geom_density(alpha = 0.4) +
   geom_histogram(position="dodge",breaks=c(-0.5, 0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5))+
@@ -187,7 +187,7 @@ mod_2 <- lm(time_read_article ~ treatment, data=d)
 mod_3 <- lm(donation ~ treatment, data=d)
 
 stargazer(mod_1,mod_2,mod_3, 
-          type="text", # comment out when knitting
+          #type="text", # comment out when knitting
           header = FALSE,
           report = ("vc*p"),
           title = "Comparing Treatment Effects",
@@ -205,7 +205,7 @@ When considering the effect of treatment on the number of questions a respondent
 mod_1 <- lm(questions_correct ~ treatment + time_read_article, data=d)
 
 stargazer(mod_1,
-          type="text", # comment out when knitting
+          #type="text", # comment out when knitting
           header = FALSE,
           report = ("vc*p"),
           title = "Comparing Treatment Effects",
@@ -227,7 +227,7 @@ mod_1 <- lm(time_read_article_bins ~ treatment, data=d)
 mod_2 <- lm(donator ~ treatment, data=d)
 
 stargazer(mod_1, mod_2,
-          type="text", # comment out when knitting
+          #type="text", # comment out when knitting
           header = FALSE,
           #report = ("vc*p"),
           title = "Comparing Treatment Effects",
@@ -241,7 +241,7 @@ stargazer(mod_1, mod_2,
 
 A surprising finding of our survey was how little time was spent reading the article. We had initially anticipated a normal or normal-esque shaped distribution of reading times around the 2 minute mark. Instead, we observed a highly right-skewed distribution of article read times. 
 
-```{r}
+```{r, echo=FALSE}
 d$treatment_factor <-as.factor(d$treatment)
 
 mean_control_time <- round(mean(d[d$treatment_factor == 0, time_read_article]), 2)
