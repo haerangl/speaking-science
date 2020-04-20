@@ -835,15 +835,22 @@ stargazer(mod_1, mod_2,
 ```
 
 
-# Generalizability
+# Generalizability Concerns
 
-## Science Communication is Broad
+We would like to believe that the observed results of our research are true; that people care more about articles if they have a personal stake in the ramifications presented in them, there are a few caveats worth mentioning about how generalizable our results are.
 
+## Science Communication Field 
+
+As discussed, the article that we chose focused on cargo ships and their effect on air pollution near the Port of Los Angeles. This is very much a niche topic in the world of science communications. As such, it can not be reasonably stated that the article represents the breadth of topics under the science communication umbrella. Journalistic scientific communication is published every day on topics of climate change, medicine, technology, space exploration, anthropology, and much more. Different science fields might benefit from different communication styles.
+Moreover, there is no reason to believe that localizing articles of every scientific field would yield benefits. The article itself was concrete and commanded an air of certainty around the topic. Other, similar, articles may be written in more abstract or hypothetical terms. 
 
 ## Comprehension is Difficult to Quantify
 
+What does it mean to understand an article? We struggled with this question a significant amount while designing our experiment. Although it's great that most of our survey respondents were able to answer knowledge questions about the contents of the article, does that mean they understand the article's complete implications? Or does it mean they retained the explicitly stated ramifications? Moreover, is any of this knowledge retained?   
+Aside from metacognition concerns, our questions followed no standard for testing knowledge simply because there isn't one. Science communication outcomes and goals are still hotly debated by experts in the fields. While we're comfortable saying that some of our users probably understood the article better than others, the number of questions answered correctly on a survey is still an imperfect proxy for quantifying how well knowledge was absorbed. 
 
 ## Competing Incentives with Mechanical Turk
 
+We mentioned earlier that we observed a surprising amount of users reading our article in under one minute. While this may be an accurate model of how people interact with news articles general, we suspect there might be another issue preventing users from taking their time reading. We conducted the survey via Mechanical Turk, an online pay-per-task service provided by Amazon. Under Mechanical Turk (mTurk), workers are directly incentivized to finish tasks with reasonable quality as fast as possible. In other words, quickly finishing individual tasks means more tasks per hour, which achieves a higher per hour earning rate. As such, we believe that some of our respondents did not take the proper amount of time reading and answering questions. To account for this, we dropped a number of responses that we believe could not have answered each question earnestly. The methodology and complete reasoning were discussed in the compliance section. This adjustment was still our best guess, which makes us hesitate to say that we would expect to see an effect of similar magnitude in the general population.
 
 # Conclusion
