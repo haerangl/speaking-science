@@ -97,9 +97,9 @@ names(p)[1] <- "reading.time"    # renamed from  "Duration (in seconds)"
 
 ### Reading Comprehension
 
-We hypothesized that if a participant finds an article more interesting because it is related to their immediate residential environment, then they would read it more closely and retain more of the information. To measure the information retention, we designed a 6-question quiz and used quiz scores as an outcome variable representing engagement, fully recognizing the following limitations to this measurement. First, this methodology assumes that the quiz performance is an accurate representation of the comprehensionm, which is likely false. Second, the methodology treats the score as a continuous variable, although one's comprehension is not on a linear scale.
+We hypothesized that if a participant finds an article more interesting because it is related to their immediate residential environment, then they would read it more closely and retain more of the information. To measure the information retention, we designed a 6-question quiz and used quiz scores as an outcome variable representing engagement, fully recognizing the following limitations to this measurement. First, this methodology assumes that the quiz performance is an accurate representation of the comprehension, which is likely false. Second, the methodology treats the score as a continuous variable, although one's comprehension is not on a linear scale.
 
-After conducting a pilot study, we studied the results and made a subjective determination that the true distribuution might look liike the following.
+After conducting a pilot study, we studied the results and made a subjective determination that the true distribution might look like the following.
 
 ```{r fig.width = 4, fig.height= 2, echo=FALSE}
 assumption.graph <- function(
@@ -626,7 +626,7 @@ ggplot(d, aes(x = questions_correct, fill = factor(treatment))) +
     panel.background = element_blank())
 ```
 
-The distribution of the reading time revealed that our assumption of normal distribution was incorrect. Although the article is 1,300 words and would take a very fast reader (200 words per minute) 7 minutes to read, about 30% of our respopndents are spending less than a minute and 40% under 2 minutes. The difference between treatment and control is only 10 seconds, as opposed to 70 seconds we thought we would see. 
+The distribution of the reading time revealed that our assumption of normal distribution was incorrect. Although the article is 1,300 words and would take a very fast reader (200 words per minute) 7 minutes to read, about 30% of our respondents are spending less than a minute and 40% under 2 minutes. The difference between treatment and control is only 10 seconds, as opposed to 70 seconds we thought we would see. 
 
 ```{r fig.width = 4, fig.height= 2, echo=FALSE}
 ggplot(d, aes(x = time_read_article, fill = factor(treatment))) +
