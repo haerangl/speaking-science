@@ -776,6 +776,45 @@ d <- d[time_answering_questions > 100, ]
 ```
 
 
+# Results
+
+## Compliance & Attrition
+
+A surprising finding of our survey was how little time was spent reading the article. We had initially anticipated a normal or normal-esque shaped distribution of reading times around the 2 minute mark. Instead, we observed a highly right-skewed distribution (shown below) of article read times. This is likely an artifact of conducting our survey on Mechanical Turk; we discuss this in more detail later on. 
+
+```{r, echo=FALSE}
+d$treatment_factor <-as.factor(d$treatment)
+
+mean_control_time <- round(mean(d[d$treatment_factor == 0, time_read_article]), 2)
+mean_treatment_time <- round(mean(d[d$treatment_factor == 1, time_read_article]), 2)
+
+
+ggplot(d, aes(x = time_read_article, fill = treatment_factor)) + 
+  # geom_density(alpha = 0.4) +
+  geom_histogram(position="dodge", binwidth=30)+
+  geom_vline(aes(xintercept = mean_control_time), color = "darkgreen", linetype = "dashed", size = 1) + 
+  geom_vline(aes(xintercept = mean_treatment_time), color = "black", linetype = "dashed", size = 1) +
+  annotate("text", x = mean_control_time - 20, y = 12, label = paste("Control mean: \n ", mean_control_time), color = "darkgreen", hjust="right") + 
+  annotate("text", x = mean_treatment_time + 20, y = 12, label = paste("Treatment mean: \n ", mean_treatment_time), color = "black", hjust="left") + 
+  ggtitle("Histogram of Reading Time (Seconds)") + geom_rug() + 
+  ylab("Frequency") +
+  xlab("Reading Time (s)")+
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_blank(),
+    panel.background = element_blank())
+```
+
+For our final analysis, we've opted to keep all reading times and not include observations for those who took fewer than 100 seconds to complete the questions portions of the survey. This is based on a question section length of 340 words and a read and answer composite time of 200 words per minute. The result is a dataset of 111 observations, 61 in control and 50 in treatment. We decided not to filter any of the Article Read Time values because our survey had forced people to stay on the page for 15 seconds. Furthermore, we believe that applying a words read per minute threshold might not be an accurate model of how people interact with journalistic writings, especially those that are scientifically oriented. We had a large number of attritors after the Mechanical Turk task was filled. We believe that this attrited was comprised of another random sampling of the population we sampled while the task was active, thus we have excluded those incomplete responses from this analysis with the belief that the exclusion won't bias our results in any direction.  
+
+```{r, include=FALSE}
+# d <- read_data()
+d <- d[time_answering_questions > 100, ]
+(table(d$treatment))
+```
+
+
 
 ## Regression Results
 A simple regression of our three outcome variables yields the following table.
@@ -836,33 +875,6 @@ stargazer(mod_1, mod_2,
 )
 ```
 
-# Compliance
-
-A surprising finding of our survey was how little time was spent reading the article. We had initially anticipated a normal or normal-esque shaped distribution of reading times around the 2 minute mark. Instead, we observed a highly right-skewed distribution of article read times.
-
-```{r, echo=FALSE}
-d$treatment_factor <-as.factor(d$treatment)
-
-mean_control_time <- round(mean(d[d$treatment_factor == 0, time_read_article]), 2)
-mean_treatment_time <- round(mean(d[d$treatment_factor == 1, time_read_article]), 2)
-
-
-ggplot(d, aes(x = time_read_article, fill = treatment_factor)) +
-  # geom_density(alpha = 0.4) +
-  geom_histogram(position="dodge", binwidth=30)+
-  geom_vline(aes(xintercept = mean_control_time), color = "darkgreen", linetype = "dashed", size = 1) +
-  geom_vline(aes(xintercept = mean_treatment_time), color = "black", linetype = "dashed", size = 1) +
-  annotate("text", x = mean_control_time - 20, y = 12, label = paste("Control mean: \n ", mean_control_time), color = "darkgreen", hjust="right") +
-  annotate("text", x = mean_treatment_time + 20, y = 12, label = paste("Treatment mean: \n ", mean_treatment_time), color = "black", hjust="left") +
-  ggtitle("Histogram of Reading Time (Seconds)") + geom_rug() +
-  ylab("Frequency") +
-  xlab("Reading Time (s)")+
-  theme(
-    panel.grid.major = element_blank(),
-    panel.grid.minor = element_blank(),
-    panel.border = element_blank(),
-    panel.background = element_blank())
-```
 
 # Generalizability
 
