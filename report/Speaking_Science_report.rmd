@@ -33,7 +33,7 @@ knitr::opts_chunk$set(echo = FALSE, warning=FALSE, message=FALSE)
 
 # Executive Summary
 
-In this experiment (N = **196** *[HL: check final N after]*), we examine whether the proximity to the location discussed in a science news article affects the reader's engagement with the article topic. We found that _____
+In this experiment (N = **196** *[HL: check final N after]*), we examine whether the proximity to the location discussed in a science news article affects the reader's engagement with the article topic. We found that **TODO**
 
 # Introduction
 
@@ -587,9 +587,9 @@ scores <- d[, grep('correct', names(d)), with=FALSE][, 1:6]
 sum.scores <- data.frame(score=apply(scores, 2, sum))
 sum.scores$q = c("Q1", "Q2", "Q3", "Q4", "Q5", "Q6")
 
-ggplot(data = sum.scores, aes(x=q, y=score, fill=q))+ geom_bar(stat="identity")+
-  ggtitle("Histogram of Correct Submissions per Question") + 
-  ylab("Num. Ppl who Got This Question Right") +
+ggplot(data = sum.scores, aes(x=q, y=score))+ geom_bar(stat="identity")+
+  ggtitle("Correct Submissions per Question") + 
+  ylab("Respondents") +
   xlab("Question Number")+
   theme(
     panel.grid.major = element_blank(),
@@ -834,6 +834,7 @@ stargazer(mod_1, mod_2,
 )
 ```
 
+\pagebreak
 
 # Generalizability Concerns
 
@@ -854,3 +855,4 @@ Aside from metacognition concerns, our questions followed no standard for testin
 We mentioned earlier that we observed a surprising amount of users reading our article in under one minute. While this may be an accurate model of how people interact with news articles general, we suspect there might be another issue preventing users from taking their time reading. We conducted the survey via Mechanical Turk, an online pay-per-task service provided by Amazon. Under Mechanical Turk (mTurk), workers are directly incentivized to finish tasks with reasonable quality as fast as possible. In other words, quickly finishing individual tasks means more tasks per hour, which achieves a higher per hour earning rate. As such, we believe that some of our respondents did not take the proper amount of time reading and answering questions. To account for this, we dropped a number of responses that we believe could not have answered each question earnestly. The methodology and complete reasoning were discussed in the compliance section. This adjustment was still our best guess, which makes us hesitate to say that we would expect to see an effect of similar magnitude in the general population.
 
 # Conclusion
+TODO
