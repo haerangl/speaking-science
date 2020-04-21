@@ -27,14 +27,13 @@ library(stargazer)
 
 # Hide code chunks in PDF
 knitr::opts_chunk$set(echo = FALSE, warning=FALSE, message=FALSE)
-
 ```
 
 \pagebreak
 
 # Executive Summary
 
-In this experiment (N = **196** *[HL: check final N after]*), we examine whether the proximity to the location discussed in a science news article affects the reader's engagement with the article topic. We found that _____
+In this experiment (N = **196** *[HL: check final N after]*), we examine whether the proximity to the location discussed in a science news article affects the reader's engagement with the article topic. We found that **TODO**
 
 # Introduction
 
@@ -98,9 +97,9 @@ names(p)[1] <- "reading.time"    # renamed from  "Duration (in seconds)"
 
 ### Reading Comprehension
 
-We hypothesized that if a participant finds an article more interesting because it is related to their immediate residential environment, then they would read it more closely and retain more of the information. To measure the information retention, we designed a 6-question quiz and used quiz scores as an outcome variable representing engagement, fully recognizing the following limitations to this measurement. First, this methodology assumes that the quiz performance is an accurate representation of the comprehensionm, which is likely false. Second, the methodology treats the score as a continuous variable, although one's comprehension is not on a linear scale.
+We hypothesized that if a participant finds an article more interesting because it is related to their immediate residential environment, then they would read it more closely and retain more of the information. To measure the information retention, we designed a 6-question quiz and used quiz scores as an outcome variable representing engagement, fully recognizing the following limitations to this measurement. First, this methodology assumes that the quiz performance is an accurate representation of the comprehension, which is likely false. Second, the methodology treats the score as a continuous variable, although one's comprehension is not on a linear scale.
 
-After conducting a pilot study, we studied the results and made a subjective determination that the true distribuution might look liike the following.
+After conducting a pilot study, we studied the results and made a subjective determination that the true distribution might look like the following.
 
 ```{r fig.width = 4, fig.height= 2, echo=FALSE}
 assumption.graph <- function(
@@ -531,16 +530,11 @@ Mechanical Turk only allowed us to filter the workers by the state. We recruited
 ## Outcome Measurement
 
 In conclusion, we measured the following five outcomes.
-
-1. Quiz score
-
-2. Donation amount
-
-3. Reading time
-
-4. Importance rating of issue
-
-5. Credibility rating of article
+1. Quiz score  
+2. Donation amount  
+3. Reading time  
+4. Importance rating of issue  
+5. Credibility rating of article  
 
 In order to ensure a high quality response, we have communicated to the survey takers that they please read as they normally would read any other article and they do not cheat on the questions.
 
@@ -549,8 +543,8 @@ In order to ensure a high quality response, we have communicated to the survey t
 
 
 ```{r, include=FALSE}
-# Import data
 
+# Import data functions
 read_data <- function(data_file) {
   if(missing(data_file)) {
     data_file <- '../data/speaking_science_data_03-24_clean.csv'
@@ -565,6 +559,11 @@ read_data <- function(data_file) {
 
   return(d)
 }
+
+lm_with_rse <- function(mod) {
+  mod$rse <- sqrt(diag(vcovHC(mod)))
+  return(mod)
+}
 ```
 
 
@@ -575,7 +574,6 @@ A total of 264 people clicked on our survey on Mechanical Turk. 64 people did no
 
 ```{r pressure, echo=FALSE, fig.cap="Sankey Diagram of survey data", out.width = '100%'}
 knitr::include_graphics("resources/sankey_diagram.jpg")
-
 ```
 
 ```{r include=FALSE}
@@ -593,9 +591,9 @@ scores <- d[, grep('correct', names(d)), with=FALSE][, 1:6]
 sum.scores <- data.frame(score=apply(scores, 2, sum))
 sum.scores$q = c("Q1", "Q2", "Q3", "Q4", "Q5", "Q6")
 
-ggplot(data = sum.scores, aes(x=q, y=score, fill=q))+ geom_bar(stat="identity")+
-  ggtitle("Histogram of Correct Submissions per Question") + 
-  ylab("Num. Ppl who Got This Question Right") +
+ggplot(data = sum.scores, aes(x=q, y=score))+ geom_bar(stat="identity")+
+  ggtitle("Correct Submissions per Question") + 
+  ylab("Respondents") +
   xlab("Question Number")+
   theme(
     panel.grid.major = element_blank(),
@@ -632,7 +630,7 @@ ggplot(d, aes(x = questions_correct, fill = factor(treatment))) +
     panel.background = element_blank())
 ```
 
-The distribution of the reading time revealed that our assumption of normal distribution was incorrect. Although the article is 1,300 words and would take a very fast reader (200 words per minute) 7 minutes to read, about 30% of our respopndents are spending less than a minute and 40% under 2 minutes. The difference between treatment and control is only 10 seconds, as opposed to 70 seconds we thought we would see. 
+The distribution of the reading time revealed that our assumption of normal distribution was incorrect. Although the article is 1,300 words and would take a very fast reader (200 words per minute) 7 minutes to read, about 30% of our respondents are spending less than a minute and 40% under 2 minutes. The difference between treatment and control is only 10 seconds, as opposed to 70 seconds we thought we would see. 
 
 ```{r fig.width = 4, fig.height= 2, echo=FALSE}
 ggplot(d, aes(x = time_read_article, fill = factor(treatment))) +
@@ -746,25 +744,54 @@ wilcox.test(d$credibility[d$treatment == 0], d$credibility[d$treatment == 1])
 # Results
 
 ## Compliance & Attrition
-For our final results, we've opted to not include observations for those who took fewer than 100 seconds to complete the questions portions of the survey. This is based on a question section length of 340 words and a read and answer composite time of 200 words per minute. The result is a dataset of 111 observations, 61 in control and 50 in treatment. We decided not to filter any of the Article Read Time values because our survey had forced people to stay on the page for 15 seconds. Furthermore, we believe that applying a words read per minute threshold might not be an accurate model of how people interact with journalistic writings, especially those that are scientifically oriented. We had a large number of attritors after the Mechanical Turk task was filled. We believe that this attrited was comprised of another random sampling of the population we sampled while the task was active, thus we have excluded those incomplete responses from this analysis with the belief that the exclusion won't bias our results in any direction.  
 
-```{r, include=FALSE}
-# d <- read_data()
-d <- d[time_answering_questions > 100, ]
-(table(d$treatment))
+We were surprised by how little time many of our respondents spent reading the article. We had anticipated a bell-curve distribution of reading times but, instead, observed a highly right-skewed distribution (shown below). The participants recruited through Mechanical Turk prefer to spend as little time on each task as possible and this preference is evident in their behaviors.
+
+```{r,fig.width = 10, fig.height=4, echo=FALSE}
+d$treatment_factor <-as.factor(d$treatment)
+
+mean_control_time <- round(mean(d[d$treatment_factor == 0, time_read_article]), 2)
+mean_treatment_time <- round(mean(d[d$treatment_factor == 1, time_read_article]), 2)
+
+
+ggplot(d, aes(x = time_read_article, fill = treatment_factor)) + 
+  # geom_density(alpha = 0.4) +
+  geom_histogram(position="dodge", binwidth=30)+
+  geom_vline(aes(xintercept = mean_control_time), color = "darkgreen", linetype = "dashed", size = 1) + 
+  geom_vline(aes(xintercept = mean_treatment_time), color = "black", linetype = "dashed", size = 1) +
+  annotate("text", x = mean_control_time - 20, y = 12, label = paste("Control mean: \n ", mean_control_time), color = "darkgreen", hjust="right") + 
+  annotate("text", x = mean_treatment_time + 20, y = 12, label = paste("Treatment mean: \n ", mean_treatment_time), color = "black", hjust="left") + 
+  ggtitle("Histogram of Reading Time (Seconds)") + geom_rug() + 
+  ylab("Frequency") +
+  xlab("Reading Time (s)")+
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_blank(),
+    panel.background = element_blank())
 ```
 
+Although the participants who spend little time on the article are unlikely to have read it thoroughly, we decided not to filter based on these values. People vary their reading behaviors when they interact with journalistic writings in real life, such as skimming or only reading the first sentences. Therefore, we did not want to impose an arbitrary threshold on the reading time.
+Instead, we excluded those participants who took fewer than 100 seconds to answer the questions that followed the reading. We arrived at the threshold of 100 seconds by dividing the total number of words in the questions section (340 words) by an above-average reading speed of 200 words per minute. The result is a dataset of 111 observations, 61 in control and 50 in treatment.
+We had a large number of attritors after the Mechanical Turk task was filled. We believe that this attrited was comprised of another random sampling of the population we sampled while the task was active, thus we have excluded those incomplete responses from this analysis with the belief that the exclusion won't bias our results in any direction.
+And while we had high attrition, we believe that it affected both control and treatment groups equally as a result of random assignment. Therefore, we exclude the attritors from the analysis and believe that doing so will not bias our results. 
 
+```{r, echo=FALSE}
+d <- read_data()
+d <- d[time_answering_questions > 100, ]
+#(table(d$treatment))
+```
 
 ## Regression Results
 A simple regression of our three outcome variables yields the following table.
 
 ```{r, echo=FALSE, results="asis"}
-mod_1 <- lm(questions_correct ~ treatment, data=d)
-mod_2 <- lm(time_read_article ~ treatment, data=d)
-mod_3 <- lm(donation ~ treatment, data=d)
+mod_1 <- lm_with_rse(lm(questions_correct ~ treatment, data=d))
+mod_2 <- lm_with_rse(lm(time_read_article ~ treatment, data=d))
+mod_3 <- lm_with_rse(lm(donation ~ treatment, data=d))
 
 stargazer(mod_1,mod_2,mod_3,
+          se = list(mod_1$rse, mod_2$rse, mod_3$rse),
           #type="text", # comment out when knitting
           header = FALSE,
           report = ("vc*p"),
@@ -780,9 +807,10 @@ As shown, we observed a treatment effect of `r round(mod_1$coefficients[[2]], 4)
 When considering the effect of treatment on the number of questions a respondent answered correctly, we wanted to make sure there were no unobserved confounds contributing to the effect. After running serveral analysis, the only significant covariate we found was Article read time. Taking Article Read Time into account yields the regression below.
 
 ```{r, echo=FALSE, results="asis"}
-mod_1 <- lm(questions_correct ~ treatment + time_read_article, data=d)
+mod_1 <- lm_with_rse(lm(questions_correct ~ treatment + time_read_article, data=d))
 
 stargazer(mod_1,
+          se = list(mod_1$rse),
           #type="text", # comment out when knitting
           header = FALSE,
           report = ("vc*p"),
@@ -795,16 +823,17 @@ stargazer(mod_1,
 
 The table does show a small effect of Article Read Time on the Questions Correct outcome variable, but the treatment effect is still there at `r round(mod_1$coefficients[[2]], 4)` and is still statistically significant at the 95% conficence level (p = `r round(anova(mod_1)$'Pr(>F)'[1], 4)`).
 
-We were not able to measure a statistically signigcant effect from either Article Time Read or Donation Ammount outcome variables. To see if we were asking the right questions, we created a binned catagory of Article Read Times for each minute and a dummy variable to represent whether or not the respondent donated. As you can see from the table below, the results are inconclusive. Log transformations of both did not help.
+We were not able to measure a statistically significant effect from either Article Time Read or Donation Ammount outcome variables. To see if we were asking the right questions, we created a binned catagory of Article Read Times for each minute and a dummy variable to represent whether or not the respondent donated. As you can see from the table below, the results are inconclusive. Log transformations of both did not help.
 
 ```{r, echo=FALSE, results="asis"}
 d$donator <- ifelse(d$donation > 0, 1, 0)
 d$time_read_article_bins <- d$time_read_article %/% 60
 
-mod_1 <- lm(time_read_article_bins ~ treatment, data=d)
-mod_2 <- lm(donator ~ treatment, data=d)
+mod_1 <- lm_with_rse(lm(time_read_article_bins ~ treatment, data=d))
+mod_2 <- lm_with_rse(lm(donator ~ treatment, data=d))
 
 stargazer(mod_1, mod_2,
+          se = list(mod_1$rse, mod_2$rse),
           #type="text", # comment out when knitting
           header = FALSE,
           #report = ("vc*p"),
@@ -815,43 +844,25 @@ stargazer(mod_1, mod_2,
 )
 ```
 
-# Compliance
+\pagebreak
 
-A surprising finding of our survey was how little time was spent reading the article. We had initially anticipated a normal or normal-esque shaped distribution of reading times around the 2 minute mark. Instead, we observed a highly right-skewed distribution of article read times.
+# Generalizability Concerns
 
-```{r, echo=FALSE}
-d$treatment_factor <-as.factor(d$treatment)
+We would like to believe that the observed results of our research are true; that people pay closer attention if they have a personal stake in the ramifications presented in a science article. However, there are a few caveats worth mentioning about the generalizability of our results.
 
-mean_control_time <- round(mean(d[d$treatment_factor == 0, time_read_article]), 2)
-mean_treatment_time <- round(mean(d[d$treatment_factor == 1, time_read_article]), 2)
+## Science Communication Field 
 
-
-ggplot(d, aes(x = time_read_article, fill = treatment_factor)) +
-  # geom_density(alpha = 0.4) +
-  geom_histogram(position="dodge", binwidth=30)+
-  geom_vline(aes(xintercept = mean_control_time), color = "darkgreen", linetype = "dashed", size = 1) +
-  geom_vline(aes(xintercept = mean_treatment_time), color = "black", linetype = "dashed", size = 1) +
-  annotate("text", x = mean_control_time - 20, y = 12, label = paste("Control mean: \n ", mean_control_time), color = "darkgreen", hjust="right") +
-  annotate("text", x = mean_treatment_time + 20, y = 12, label = paste("Treatment mean: \n ", mean_treatment_time), color = "black", hjust="left") +
-  ggtitle("Histogram of Reading Time (Seconds)") + geom_rug() +
-  ylab("Frequency") +
-  xlab("Reading Time (s)")+
-  theme(
-    panel.grid.major = element_blank(),
-    panel.grid.minor = element_blank(),
-    panel.border = element_blank(),
-    panel.background = element_blank())
-```
-
-# Generalizability
-
-## Science Communication is Broad
-
+The article used in the study focused on a specific topic of cargo ships and their effect on air pollution near the ports. We cannot argue that the topic represents the breadth of the general science communication. Every day, journals publish articles on myriad topics, including climate change, medicine, technology, space exploration, anthropology, and more. Engagement in different fields might benefit from different styles or variables.
+Moreover, there is no reason to believe that localizing articles of every scientific field would yield benefits. The article itself was concrete and commanded an air of certainty around the topic. Other, similar, articles may be written in more abstract or hypothetical terms. 
 
 ## Comprehension is Difficult to Quantify
 
+What does it mean to understand an article? We struggled with this question while designing our experiment. Although it's great that most of our survey respondents were able to answer knowledge questions about the contents of the article, does that mean they understand the article's complete implications? Or does it mean they retained the explicitly stated ramifications? Moreover, is any of this knowledge retained?   
+Aside from metacognition concerns, our questions followed no standard for testing knowledge simply because there isn't one. Science communication outcomes and goals are still hotly debated by experts in the fields. While we're comfortable saying that some of our users probably understood the article better than others, the number of questions answered correctly on a survey is still an imperfect proxy for quantifying how well knowledge was absorbed. 
 
 ## Competing Incentives with Mechanical Turk
 
+We conducted the survey via Mechanical Turk, an online pay-per-task service provided by Amazon. Under Mechanical Turk (mTurk), workers want to finish tasks with reasonable quality as fast as possible, so they can complete more tasks per hour and collect more rewards. This incentive structure led some of our respondents to not dedicate sufficient attention or care to reading or answering questions. To account for this, we dropped the responses that we believe could not have answered each question earnestly. Nonetheless, this adjustment was still our best guess, which makes us hesitate to say that we would expect to see an effect of similar magnitude in the general population.
 
 # Conclusion
+TODO
