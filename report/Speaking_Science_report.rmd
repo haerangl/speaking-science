@@ -33,7 +33,7 @@ knitr::opts_chunk$set(echo = FALSE, warning=FALSE, message=FALSE)
 
 # Executive Summary
 
-In this experiment (N = **196** *[HL: check final N after]*), we examine whether the proximity to the location discussed in a science news article affects the reader's engagement with the article topic. We found that **TODO**
+In this experiment, we examine whether the proximity to the location discussed in a science news article affects the reader's engagement with the article and its topic. The treatment group scored slightly better than the control group and tended to think that the issue discussed was more important. However, treatment and control did not show a significant difference in the article read time, the donation toward the cause discussed in the article, or the rating of the article's credibility.  In addition to the analysis, we also discuss the experiment design process and thoughtful data collection to maximize the chance that we detect any real treatment effects.
 
 # Introduction
 
@@ -47,7 +47,7 @@ After they had read the articles, we asked them questions to collect the followi
 
 1. Reading comprehension quiz score (0 - 6 points)
 2. Donation amount toward alleviating air pollution, if they won a $100 raffle from this survey
-3. Article reading time
+3. Article read time
 4. Rating of importance of the air pollution issue
 5. Rating of credibility of the article
 
@@ -62,14 +62,14 @@ The most challenging part of our journey was to crystallize the research questio
 
 In the first iteration of our research design, we considered testing whether the jargon and the author of a tweet would change the click-through rate (CTR). However, we did not believe that clicking on a link necessarily indicated an intrinsic fascination with science or signaled a long-term effect.
 
-We reached out to a contact at the Lawrence Berkeley National Laboratory called Tim Hurt, who develops science education curriculums. He shared some surveys that his team used to measure students' interest or fascination with science. We considered using a modified version of this survey, which would have given us a self-reported level of engagement. However, we did not believe that a feeling of engagement with science would change within the short timeframe of our research. Finally, only after spending a long time exploring two utterly different research questions, we arrived at the idea of measuring the impact of local news on engagement.
+We reached out to a contact at the Lawrence Berkeley National Laboratory, Tim Hurt, who develops science education curriculums. He shared some surveys that his team used to measure students' interest or fascination with science. We considered using a modified version of this survey, which would have given us a self-reported level of engagement. However, we did not believe that a feeling of engagement with science would change within the short timeframe of our research. Finally, only after spending a long time exploring two utterly different research questions, we arrived at the idea of measuring the impact of local news on engagement.
 
 
 ## Choosing the Article
 
 We gave careful considerations to the topic, which could influence the outcome. For instance, a divisive topic such as climate change could impact the engagement of a subset of the readers with a particular political affiliation and violate the excludability assumption. On the other extreme, a highly esoteric topic could fail to engage a majority of our readers. After some discussion, we determined that pollution and its impact on people's lives could be neutral and relatable enough for the study.
 
-In our pilot study, we discovered more variables that affected the outcome. All of the respondents scored 100% on the reading comprehension quiz, because the article was too short and easy. The lack of variance implied that any existing treatment effect would be hard to detect. So we picked a new article that was longer and made the quiz harder.
+In our first pilot study, we discovered more variables that affected the outcome. All of the respondents scored 100% on the reading comprehension quiz, because the article was too short and easy. The lack of variance implied that any existing treatment effect would be hard to detect. So we picked a new article that was longer and made the quiz harder.
 
 Our article of choice was about large ships contributing to air pollution. We recruited participants from LA and used Qualtrics features to randomly assign treatment by the individual. The treatment group was given the article with references to LA. In contrast, the control group was given the same article with references to New York, because New York was a coastal city with a similar population as LA and had large ports that the article could be about.
 
@@ -84,7 +84,7 @@ Due to the limited resources we had, we wanted to stick to a single article in w
 
 ## Power Analysis & Outcome
 
-```{r include=FALSE}
+```{r include=FALSE }
 p <- fread('../data/pilot.csv')
 
 p$d <-ifelse(is.na(p$"Q3.3_First Click"), 0, 1)
@@ -99,9 +99,9 @@ names(p)[1] <- "reading.time"    # renamed from  "Duration (in seconds)"
 
 We hypothesized that if a participant finds an article more interesting because it is related to their immediate residential environment, then they would read it more closely and retain more of the information. To measure the information retention, we designed a 6-question quiz and used quiz scores as an outcome variable representing engagement, fully recognizing the following limitations to this measurement. First, this methodology assumes that the quiz performance is an accurate representation of the comprehension, which is likely false. Second, the methodology treats the score as a continuous variable, although one's comprehension is not on a linear scale.
 
-After conducting a pilot study, we studied the results and made a subjective determination that the true distribution might look like the following.
+After conducting the second pilot study, we studied the results and made a subjective determination that the true distribution might look like the following.
 
-```{r fig.width = 4, fig.height= 2, echo=FALSE}
+```{r fig.width = 4, fig.height= 2, echo=FALSE, fig.cap="Quiz Score Assumed Distribution"}
 assumption.graph <- function(
   score.list,
   prob_control,   
@@ -162,7 +162,7 @@ assumption.graph(
 
 Assuming that the above represents the true distribution, the power analysis indicated that we would need at least 100 respondents to achieve a power of 90%. *(Note: Due to the random nature, the minimum sample size may change, but it's generally in the 100-120 range.)*
 
-```{r}
+```{r }
 # Function to run simulations and calculate power for each sim 
 power_test_discrete <- function(
   conditions,
@@ -200,7 +200,7 @@ power_test_discrete <- function(
 ```
 
 
-```{r fig.width = 4, fig.height= 3, echo=FALSE}
+```{r fig.width = 4, fig.height= 3, echo=FALSE, fig.cap="Required Sample Size for Power - Quiz Score"}
 # Function to plot power graph
 plot.power <- function(
   conditions,
@@ -294,7 +294,7 @@ We were interested in whether the treatment could compel the subjects to take ac
 
 We were not sure what the actual distribution of donation amounts might look like. We tried two different assumptions and the power analysis indicated that either 100 observations would be enough or 700 would be insufficient to achieve the power of 90%. However, our budget did not allow us to collect more than 200 samples. In conclusion, we are uncertain that we will have enough power to detect any real treatment effects in the donation amounts in this study.
 
-```{r fig.width = 8, fig.height= 5, echo=FALSE}
+```{r fig.width = 8, fig.height= 5, echo=FALSE, fig.cap="Power Analysis for Donations"}
 don.dist.1 <- assumption.graph(
   score.list = c(0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100),
   prob_control=  c(5, 2, 3, 2, 1, 1, 1, 1, 1, 1, 1), 
@@ -342,7 +342,7 @@ grid.arrange(don.dist.1, don.power.1,
 
 
 
-### Article Reading Time
+### Article Read Time
 
 ```{r include=FALSE}
 avgtime <- p[ , .('mu_reading.time' = mean(reading.time)), keyby = .(d)]
@@ -355,7 +355,7 @@ p[ , t.test(reading.time ~ d)]   # not much difference here lolll
 
 For a long article of 1,300 words, compliance was a concern. However, in real life, we wouldn't expect most people to read the whole article. Since the location was indicated in the title of the article, we decided to think of that as the treatment and see how the reading time changes in response.
 
-For the power analysis, we took the average reading time from the pilot, but reduced the standard deviation from the pilot by 20%, taking into account a larger sample size we will collect from the full study. As a result, we calculated that 100 observations is sufficient to achieve a power of 90%.
+For the power analysis, we took the average article read time from the pilot, but reduced the standard deviation from the pilot by 20%, taking into account a larger sample size we will collect from the full study. As a result, we calculated that 100 observations is sufficient to achieve a power of 90%.
 
 ```{r}
 assumption.graph.normal <- function(
@@ -364,7 +364,7 @@ assumption.graph.normal <- function(
   ,sd_control = 120
   ,sd_treat =   120
   ,number_per_condition = 500
-  ,var_name = "Reading Time (s)"
+  ,var_name = "Article Read Time (s)"
   ,maintitle= "Simulated Distributions of Treatment and Control"
   ){
   # Simulate data
@@ -510,16 +510,15 @@ read.time.power <- plot.power.norm(
       power_loops = 100,
       ri_loops = 100,
       verbose = TRUE,
-      var_name = "Reading Time"
+      var_name = "Read Time"
       )
 
 ```
 
-```{r fig.width = 8, fig.height= 2, echo=FALSE}
+```{r fig.width = 8, fig.height= 2, fig.cap="Power Analysis for Read Time", echo=FALSE}
 grid.arrange(read.assumed, read.time.power, ncol = 2)
 ```
 
-\pagebreak
 
 # Final Research Methodology
 
@@ -527,19 +526,30 @@ grid.arrange(read.assumed, read.time.power, ncol = 2)
 
 Mechanical Turk only allowed us to filter the workers by the state. We recruited 200 survey respondents from Amazon Mechanical Turk in California. In order to filter workers by those living in LA, we instructed the workers to accept the task only if they lived in LA. Additionally, the first question on Qualtrics asked whether the respondent lived in LA and if they didn't, they exited the survey. As a result, all self-identifying LA residents were randomly assigned treatment or control, then given a series of questions.
 
+
+```{r echo=FALSE, fig.cap="Survey Flow", out.width = '100%'}
+knitr::include_graphics("resources/surveyflow.png")
+```
+
 ## Outcome Measurement
 
 In conclusion, we measured the following five outcomes.
+
 1. Quiz score  
 2. Donation amount  
-3. Reading time  
+3. Article read time  
 4. Importance rating of issue  
 5. Credibility rating of article  
 
 In order to ensure a high quality response, we have communicated to the survey takers that they please read as they normally would read any other article and they do not cheat on the questions.
 
 
-# Analysis and Results
+```{r echo=FALSE, fig.cap="Treatment and Randomization", out.width = '35%'}
+knitr::include_graphics("resources/roxy.png")
+```
+
+
+# Exploratory Data Analysis (EDA)
 
 
 ```{r, include=FALSE}
@@ -567,8 +577,6 @@ lm_with_rse <- function(mod) {
 ```
 
 
-## Exploratory Data Analysis
-
 A total of 264 people clicked on our survey on Mechanical Turk. 64 people did not complete the survey. Out of the 200 who completed the survey, we dropped 6 people, either due to missing quiz answers or because they stated that they were not LA residents. We did not exclude the 40 people whose IP address was from outside of CA, because they may be traveling. In the end, we had 97 people in treatment and 97 in control. See graphical representation of survey participants below. 
 
 
@@ -585,7 +593,7 @@ names(d)
 
 Some questions were more difficult than others.
 
-```{r, fig.width = 4, fig.height= 2}
+```{r, fig.width = 4, fig.height= 2, fig.cap="Question Difficulty"}
 scores <- d[, grep('correct', names(d)), with=FALSE][, 1:6]
 
 sum.scores <- data.frame(score=apply(scores, 2, sum))
@@ -611,15 +619,15 @@ mean.score.t <-round(d[d$treatment == 1][ , mean(questions_correct)], 2)
 
 Below is the histogram of the quiz scores, which resembles our assumed distribution at the power analysis steps, except that not a single respondent out of the final 196 observations scored 6 out of 6. The mean score of the treatment group was `r mean.score.t` and that of the control group was `r mean.score.c`.
 
-```{r,  fig.width = 4, fig.height= 2, echo=FALSE}
+```{r,  fig.width = 5, fig.height= 3, echo=FALSE, fig.cap="Actual Distribution of Quiz Scores"}
 
 ggplot(d, aes(x = questions_correct, fill = factor(treatment))) +
   # geom_density(alpha = 0.4) +
   geom_histogram(position="dodge", breaks=c(-0.5, 0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5))+
   geom_vline(aes(xintercept = mean(d[d$treatment == 0, questions_correct])), color = "darkgreen", linetype = "dashed", size = 1) +
   geom_vline(aes(xintercept = mean(d[d$treatment == 1, questions_correct])), color = "black", linetype = "dashed", size = 1) +
-  annotate("text", x = 2.3, y = 30, label = paste("Control mean:", mean.score.c), color = "darkgreen", hjust="right") +
-  annotate("text", x = 2.8, y = 30, label = paste("Treat mean:", mean.score.t), color = "black", hjust="left") +
+  annotate("text", x = 2.3, y = 30, label = paste("Control mean:", mean.score.c), color = "darkgreen", hjust="right", size=3) +
+  annotate("text", x = 2.8, y = 30, label = paste("Treat mean:", mean.score.t), color = "black", hjust="left", size=3) +
   ggtitle("Histogram of Quiz Scores") + geom_rug() +
   ylab("Frequency") +
   xlab("Quiz Scores")+
@@ -630,19 +638,19 @@ ggplot(d, aes(x = questions_correct, fill = factor(treatment))) +
     panel.background = element_blank())
 ```
 
-The distribution of the reading time revealed that our assumption of normal distribution was incorrect. Although the article is 1,300 words and would take a very fast reader (200 words per minute) 7 minutes to read, about 30% of our respondents are spending less than a minute and 40% under 2 minutes. The difference between treatment and control is only 10 seconds, as opposed to 70 seconds we thought we would see. 
+The distribution of the article read time revealed that our assumption of normal distribution was incorrect. Although the article is 1,300 words and would take a very fast reader (200 words per minute) 7 minutes to read, about 30% of our respondents are spending less than a minute and 40% under 2 minutes. The difference between treatment and control is only 10 seconds, as opposed to 70 seconds we thought we would see. 
 
-```{r fig.width = 4, fig.height= 2, echo=FALSE}
+```{r fig.width = 5, fig.height= 3, echo=FALSE, fig.cap="Actual Distribution of Article Read Time"}
 ggplot(d, aes(x = time_read_article, fill = factor(treatment))) +
   # geom_density(alpha = 0.4) +
   geom_histogram(position="dodge", binwidth=30)+
   geom_vline(aes(xintercept = mean(d[d$treatment == 0, time_read_article])), color = "darkgreen", linetype = "dashed", size = 1) +
   geom_vline(aes(xintercept = mean(d[d$treatment == 1, time_read_article])), color = "black", linetype = "dashed", size = 1) +
-  annotate("text", x = 180, y = 20, label = "Control mean: \n 185.0 s", color = "darkgreen", hjust="right") +
-  annotate("text", x = 200, y = 20, label = "Treat mean:\n 195.9", color = "black", hjust="left") +
-  ggtitle("Histogram of Reading Time") + geom_rug() +
+  annotate("text", x = 180, y = 20, label = "Control \nmean: \n 185.0 s", color = "darkgreen", hjust="right", size=3) +
+  annotate("text", x = 200, y = 20, label = "Treat \nmean:\n 195.9", color = "black", hjust="left", size=3) +
+  ggtitle("Histogram of Article Read Time") + geom_rug() +
   ylab("Frequency") +
-  xlab("Reading Time (s)")+
+  xlab("Article Read Time (s)")+
   theme(
     panel.grid.major = element_blank(),
     panel.grid.minor = element_blank(),
@@ -656,7 +664,7 @@ The actual distribution of donation amounts seems to have a much smaller treatme
 
 
 
-```{r fig.width = 4, fig.height= 2, echo=FALSE}
+```{r fig.width = 5, fig.height= 3, echo=FALSE, fig.cap="Actual Distribution of Donation"}
 mean.don.c <- round(d[d$treatment == 0][ , mean(donation)], 2)
 mean.don.t <-round(d[d$treatment == 1][ , mean(donation)], 2)
 
@@ -666,8 +674,8 @@ ggplot(d, aes(x = donation, fill = factor(treatment))) +
   geom_histogram(position="dodge", binwidth=10)+
   geom_vline(aes(xintercept = mean(d[d$treatment == 0, donation])), color = "darkgreen", linetype = "dashed", size = 1) +
   geom_vline(aes(xintercept = mean(d[d$treatment == 1, donation])), color = "black", linetype = "dashed", size = 1) +
-  annotate("text", x = mean.don.c, y = 20, label = paste("Control mean", mean.don.c), color = "darkgreen", hjust="left") +
-  annotate("text", x = mean.don.t, y = 20, label = paste("Treat mean", mean.don.t), color = "black", hjust="right") +
+  annotate("text", x = mean.don.c, y = 20, label = paste("Control \nmean\n", mean.don.c), color = "darkgreen", hjust="left", size=3) +
+  annotate("text", x = mean.don.t, y = 20, label = paste("Treat \nmean\n", mean.don.t), color = "black", hjust="right", size=3) +
   ggtitle("Histogram of Donation Amount") + geom_rug() +
   ylab("Frequency") +
   xlab("Donation ($)")+
@@ -679,11 +687,11 @@ ggplot(d, aes(x = donation, fill = factor(treatment))) +
 ```
 
 
-We examined the distribution of reading time (left) and donation amount (right) per quiz score. Unsurprisingly, those who spend more time to read the article perform better on the quiz. On the other hand, those that performed better on the quiz, and therefore those we predicted to take more action in real life, tended to donate less toward the cause. It might indicate that the more effort people put in reading and answering the questions, the less they were inclined to donate their hard-earned money.
+We examined the distribution of article read time (left) and donation amount (right) per quiz score. Unsurprisingly, those who spend more time to read the article perform better on the quiz. On the other hand, those that performed better on the quiz, and therefore those we predicted to take more action in real life, tended to donate less toward the cause. It might indicate that the more effort people put in reading and answering the questions, the less they were inclined to donate their hard-earned money.
 
 
-```{r, fig.width = 10, fig.height= 3, echo=FALSE}
-a <- ggplot(d, aes(x = as.factor(questions_correct), y = time_read_article, color = factor(treatment) )) + geom_boxplot() + ylab("Reading Time (s)") +
+```{r, fig.width = 10, fig.height= 3, echo=FALSE, fig.cap="Relationship of Article Read Time and Donation to Quiz Score"}
+a <- ggplot(d, aes(x = as.factor(questions_correct), y = time_read_article, color = factor(treatment) )) + geom_boxplot() + ylab("Article Read Time (s)") +
   xlab("Quiz Score")+
   theme(
     panel.grid.major = element_blank(),
@@ -705,10 +713,10 @@ grid.arrange(a, b, ncol = 2)
 
 We asked the participants to rate the topic importance and article credibility on a scale of 1 to 7. On the right, credibility seems similar between treatment and control. On the left, treatment tends to assign higher importance ratings than control. According to the Wilcoxon rank-sum test, this difference in importance rating is statistically significant at the 0.05 level, in accordance with our hypothesis.
 
-```{r,fig.width = 10, fig.height= 3, echo=FALSE}
+```{r,fig.width = 10, fig.height= 3, echo=FALSE, fig.cap="Subjective Ratings on the Article and Its Topic"}
 plot1 <- ggplot(d, aes(x = importance, fill = factor(treatment))) +
   # geom_density(alpha = 0.4) +
-  geom_histogram(position="dodge",breaks=c(-0.5, 0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5))+
+  geom_histogram(position="dodge",breaks=c(0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5))+
   ggtitle("Histogram of Perceived Importance Ratings") + geom_rug() +
   ylab("Frequency") +
   xlab("Importance Rating")+
@@ -720,7 +728,7 @@ plot1 <- ggplot(d, aes(x = importance, fill = factor(treatment))) +
 
 plot2 <- ggplot(d, aes(x = credibility, fill = factor(treatment))) +
   # geom_density(alpha = 0.4) +
-  geom_histogram(position="dodge",breaks=c(-0.5, 0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5))+
+  geom_histogram(position="dodge",breaks=c(0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5))+
   ggtitle("Histogram of Perceived Credibility Ratings") + geom_rug() +
   ylab("Frequency") +
   xlab("Credibility Rating")+
@@ -745,9 +753,9 @@ wilcox.test(d$credibility[d$treatment == 0], d$credibility[d$treatment == 1])
 
 ## Compliance & Attrition
 
-We were surprised by how little time many of our respondents spent reading the article. We had anticipated a bell-curve distribution of reading times but, instead, observed a highly right-skewed distribution (shown below). The participants recruited through Mechanical Turk prefer to spend as little time on each task as possible and this preference is evident in their behaviors.
+We were surprised by how little time many of our respondents spent reading the article. We had anticipated a bell-curve distribution of article read times but, instead, observed a highly right-skewed distribution (shown below). The participants recruited through Mechanical Turk prefer to spend as little time on each task as possible and this preference is evident in their behaviors.
 
-```{r,fig.width = 10, fig.height=4, echo=FALSE}
+```{r,fig.width = 10, fig.height=4, echo=FALSE, fig.cap="Actual Distribution of Article Read Time"}
 d$treatment_factor <-as.factor(d$treatment)
 
 mean_control_time <- round(mean(d[d$treatment_factor == 0, time_read_article]), 2)
@@ -761,9 +769,9 @@ ggplot(d, aes(x = time_read_article, fill = treatment_factor)) +
   geom_vline(aes(xintercept = mean_treatment_time), color = "black", linetype = "dashed", size = 1) +
   annotate("text", x = mean_control_time - 20, y = 12, label = paste("Control mean: \n ", mean_control_time), color = "darkgreen", hjust="right") + 
   annotate("text", x = mean_treatment_time + 20, y = 12, label = paste("Treatment mean: \n ", mean_treatment_time), color = "black", hjust="left") + 
-  ggtitle("Histogram of Reading Time (Seconds)") + geom_rug() + 
+  ggtitle("Histogram of Article Read Time (Seconds)") + geom_rug() + 
   ylab("Frequency") +
-  xlab("Reading Time (s)")+
+  xlab("Article Read Time (s)")+
   theme(
     panel.grid.major = element_blank(),
     panel.grid.minor = element_blank(),
@@ -771,7 +779,7 @@ ggplot(d, aes(x = time_read_article, fill = treatment_factor)) +
     panel.background = element_blank())
 ```
 
-Although the participants who spend little time on the article are unlikely to have read it thoroughly, we decided not to filter based on these values. People vary their reading behaviors when they interact with journalistic writings in real life, such as skimming or only reading the first sentences. Therefore, we did not want to impose an arbitrary threshold on the reading time.
+Although the participants who spend little time on the article are unlikely to have read it thoroughly, we decided not to filter based on these values. People vary their reading behaviors when they interact with journalistic writings in real life, such as skimming or only reading the first sentences. Therefore, we did not want to impose an arbitrary threshold on the article read time.
 Instead, we excluded those participants who took fewer than 100 seconds to answer the questions that followed the reading. We arrived at the threshold of 100 seconds by dividing the total number of words in the questions section (340 words) by an above-average reading speed of 200 words per minute. The result is a dataset of 111 observations, 61 in control and 50 in treatment.
 We had a large number of attritors after the Mechanical Turk task was filled. We believe that this attrited was comprised of another random sampling of the population we sampled while the task was active, thus we have excluded those incomplete responses from this analysis with the belief that the exclusion won't bias our results in any direction.
 And while we had high attrition, we believe that it affected both control and treatment groups equally as a result of random assignment. Therefore, we exclude the attritors from the analysis and believe that doing so will not bias our results. 
