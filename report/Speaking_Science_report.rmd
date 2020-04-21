@@ -865,4 +865,6 @@ Aside from metacognition concerns, our questions followed no standard for testin
 We conducted the survey via Mechanical Turk, an online pay-per-task service provided by Amazon. Under Mechanical Turk (mTurk), workers want to finish tasks with reasonable quality as fast as possible, so they can complete more tasks per hour and collect more rewards. This incentive structure led some of our respondents to not dedicate sufficient attention or care to reading or answering questions. To account for this, we dropped the responses that we believe could not have answered each question earnestly. Nonetheless, this adjustment was still our best guess, which makes us hesitate to say that we would expect to see an effect of similar magnitude in the general population.
 
 # Conclusion
-TODO
+
+At the end of the day, when we treated Los Angeles residents with articles that mentioned Los Angeles, they ended up performing better on the reading comprehension quiz we designed. We could not measure a treatment effect at the 95% conficence level for how long the respondents read the article for, nor could we for whether or not they donated or even if they donated. We believe that these results are partly due to conducting the survey on AWS Mechanical Turk. We would like to repeat this experiment with a survey population that would translate better to the general American population.
+
