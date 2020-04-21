@@ -798,7 +798,7 @@ stargazer(mod_1,mod_2,mod_3,
           title = "Comparing Treatment Effects",
           covariate.labels = c("Treatment"),
           omit = c("Constant", "Observations"),
-          dep.var.labels = c("Questions Correct", "Article Read Time (seconds)", "Donation in USD")
+          dep.var.labels = c("Quiz Score", "Article Read Time (seconds)", "Donation in USD")
           )
 ```
 
@@ -817,11 +817,11 @@ stargazer(mod_1,
           title = "Comparing Treatment Effects",
           covariate.labels = c("Treatment", "Article Read Time (seconds)"),
           omit = c("Constant", "Observations"),
-          dep.var.labels = c("Questions Correct")
+          dep.var.labels = c("Quiz Score")
 )
 ```
 
-The table does show a small effect of Article Read Time on the Questions Correct outcome variable, but the treatment effect is still there at `r round(mod_1$coefficients[[2]], 4)` and is still statistically significant at the 95% conficence level (p = `r round(anova(mod_1)$'Pr(>F)'[1], 4)`).
+The table does show a small effect of Article Read Time on the Quiz Score outcome variable, but the treatment effect is still there at `r round(mod_1$coefficients[[2]], 4)` and is still statistically significant at the 95% conficence level (p = `r round(anova(mod_1)$'Pr(>F)'[1], 4)`).
 
 We were not able to measure a statistically significant effect from either Article Time Read or Donation Ammount outcome variables. To see if we were asking the right questions, we created a binned catagory of Article Read Times for each minute and a dummy variable to represent whether or not the respondent donated. As you can see from the table below, the results are inconclusive. Log transformations of both did not help.
 
