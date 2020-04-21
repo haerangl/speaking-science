@@ -33,7 +33,7 @@ knitr::opts_chunk$set(echo = FALSE, warning=FALSE, message=FALSE)
 
 # Executive Summary
 
-In this experiment, we examine whether the proximity to the location discussed in a science news article affects the reader's engagement with the article and its topic. The treatment group scored slightly better than the control group and tended to think that the issue discussed was more important. However, treatment and control did not show a significant difference in the article read time, the donation toward the cause discussed in the article, or the rating of the article's credibility.  In addition to the analysis, we also discuss the experiment design process and thoughtful data collection to maximize the chance that we detect any real treatment effects.
+In this experiment, we examine whether the proximity to the location discussed in a science news article affects the reader's engagement with the article and its topic. The treatment group scored slightly better than the control group and tended to think that the issue discussed was more important. However, treatment and control did not show a significant difference in the article reading time, the donation toward the cause discussed in the article, or the rating of the article's credibility.  In addition to the analysis, we also discuss the experiment design process and thoughtful data collection to maximize the chance that we detect any real treatment effects.
 
 # Introduction
 
@@ -47,7 +47,7 @@ After they had read the articles, we asked them questions to collect the followi
 
 1. Reading comprehension quiz score (0 - 6 points)
 2. Donation amount toward alleviating air pollution, if they won a $100 raffle from this survey
-3. Article read time
+3. Article reading time
 4. Rating of importance of the air pollution issue
 5. Rating of credibility of the article
 
@@ -342,7 +342,7 @@ grid.arrange(don.dist.1, don.power.1,
 
 
 
-### Article Read Time
+### Article Reading Time
 
 ```{r include=FALSE}
 avgtime <- p[ , .('mu_reading.time' = mean(reading.time)), keyby = .(d)]
@@ -355,7 +355,7 @@ p[ , t.test(reading.time ~ d)]   # not much difference here lolll
 
 For a long article of 1,300 words, compliance was a concern. However, in real life, we wouldn't expect most people to read the whole article. Since the location was indicated in the title of the article, we decided to think of that as the treatment and see how the reading time changes in response.
 
-For the power analysis, we took the average article read time from the pilot, but reduced the standard deviation from the pilot by 20%, taking into account a larger sample size we will collect from the full study. As a result, we calculated that 100 observations is sufficient to achieve a power of 90%.
+For the power analysis, we took the average article reading time from the pilot, but reduced the standard deviation from the pilot by 20%, taking into account a larger sample size we will collect from the full study. As a result, we calculated that 100 observations is sufficient to achieve a power of 90%.
 
 ```{r}
 assumption.graph.normal <- function(
@@ -364,7 +364,7 @@ assumption.graph.normal <- function(
   ,sd_control = 120
   ,sd_treat =   120
   ,number_per_condition = 500
-  ,var_name = "Article Read Time (s)"
+  ,var_name = "Article Reading Time (s)"
   ,maintitle= "Simulated Distributions of Treatment and Control"
   ){
   # Simulate data
@@ -533,13 +533,13 @@ knitr::include_graphics("resources/surveyflow.png")
 
 ## Outcome Measurement
 
-In conclusion, we measured the following five outcomes.
+In conclusion, we measured the following five outcomes and compared the difference between the treatment and control groups to find the treatment effect, as shown in the diagram below.
 
-1. Quiz score  
-2. Donation amount  
-3. Article read time  
-4. Importance rating of issue  
-5. Credibility rating of article  
+1. Quiz score
+2. Donation amount
+3. Article reading time
+4. Rating of importance of the issue
+5. Rating of credibility of the article
 
 In order to ensure a high quality response, we have communicated to the survey takers that they please read as they normally would read any other article and they do not cheat on the questions.
 
@@ -591,7 +591,7 @@ nrow(d)
 names(d)
 ```
 
-Some questions were more difficult than others.
+We decided to use relatively hard questions in the reading comprehension quiz, to ensure that only people who paid attention to the article would score high. The number of correct responses per question is shown in Figure 8. It is evident that some questions were more difficult than others.
 
 ```{r, fig.width = 4, fig.height= 2, fig.cap="Question Difficulty"}
 scores <- d[, grep('correct', names(d)), with=FALSE][, 1:6]
@@ -617,7 +617,7 @@ mean.score.c <- round(d[d$treatment == 0][ , mean(questions_correct)], 2)
 mean.score.t <-round(d[d$treatment == 1][ , mean(questions_correct)], 2)
 ```
 
-Below is the histogram of the quiz scores, which resembles our assumed distribution at the power analysis steps, except that not a single respondent out of the final 196 observations scored 6 out of 6. The mean score of the treatment group was `r mean.score.t` and that of the control group was `r mean.score.c`.
+Figure 9 shows the histogram of the quiz scores, which resembles our assumed distribution at the power analysis steps, except that not a single respondent out of the final 196 observations scored 6 out of 6. The mean score of the treatment group was `r mean.score.t` and that of the control group was `r mean.score.c`.
 
 ```{r,  fig.width = 5, fig.height= 3, echo=FALSE, fig.cap="Actual Distribution of Quiz Scores"}
 
@@ -638,9 +638,9 @@ ggplot(d, aes(x = questions_correct, fill = factor(treatment))) +
     panel.background = element_blank())
 ```
 
-The distribution of the article read time revealed that our assumption of normal distribution was incorrect. Although the article is 1,300 words and would take a very fast reader (200 words per minute) 7 minutes to read, about 30% of our respondents are spending less than a minute and 40% under 2 minutes. The difference between treatment and control is only 10 seconds, as opposed to 70 seconds we thought we would see. 
+The distribution of the article reading time, Figure 10, revealed that our assumption of normal distribution was incorrect. Although the article is 1,300 words and would take a very fast reader (200 words per minute) 7 minutes to read, about 30% of our respondents are spending less than a minute and 40% under 2 minutes. The difference between treatment and control is only 10 seconds, as opposed to 70 seconds we thought we would see. 
 
-```{r fig.width = 5, fig.height= 3, echo=FALSE, fig.cap="Actual Distribution of Article Read Time"}
+```{r fig.width = 5, fig.height= 3, echo=FALSE, fig.cap="Actual Distribution of Article Reading Time"}
 ggplot(d, aes(x = time_read_article, fill = factor(treatment))) +
   # geom_density(alpha = 0.4) +
   geom_histogram(position="dodge", binwidth=30)+
@@ -648,9 +648,9 @@ ggplot(d, aes(x = time_read_article, fill = factor(treatment))) +
   geom_vline(aes(xintercept = mean(d[d$treatment == 1, time_read_article])), color = "black", linetype = "dashed", size = 1) +
   annotate("text", x = 180, y = 20, label = "Control \nmean: \n 185.0 s", color = "darkgreen", hjust="right", size=3) +
   annotate("text", x = 200, y = 20, label = "Treat \nmean:\n 195.9", color = "black", hjust="left", size=3) +
-  ggtitle("Histogram of Article Read Time") + geom_rug() +
+  ggtitle("Histogram of Article Reading Time") + geom_rug() +
   ylab("Frequency") +
-  xlab("Article Read Time (s)")+
+  xlab("Article Reading Time (s)")+
   theme(
     panel.grid.major = element_blank(),
     panel.grid.minor = element_blank(),
@@ -660,7 +660,7 @@ ggplot(d, aes(x = time_read_article, fill = factor(treatment))) +
 
 
 
-The actual distribution of donation amounts seems to have a much smaller treatment effect than either one of our assumed distributions at the time of the power analysis. Since our "worse case model" required more than 800 observations and this distribution seems to indicate even smaller (if any) treatment effect, we are doubtful we will detect any treatment effects here.
+The actual distribution of donation amounts, Figure 11, seems to have a much smaller treatment effect than either one of our assumed distributions at the time of the power analysis, shown in Figure 3. Since our "worse case model" required more than 800 observations and this distribution seems to indicate even smaller (if any) treatment effect, we are doubtful we will detect any treatment effects here.
 
 
 
@@ -687,11 +687,11 @@ ggplot(d, aes(x = donation, fill = factor(treatment))) +
 ```
 
 
-We examined the distribution of article read time (left) and donation amount (right) per quiz score. Unsurprisingly, those who spend more time to read the article perform better on the quiz. On the other hand, those that performed better on the quiz, and therefore those we predicted to take more action in real life, tended to donate less toward the cause. It might indicate that the more effort people put in reading and answering the questions, the less they were inclined to donate their hard-earned money.
+We examined the distribution of article reading time (Figure 12, left) and donation amount (Figure 12, right) per quiz score. Unsurprisingly, those who spend more time to read the article perform better on the quiz. On the other hand, those that performed better on the quiz, and therefore those we predicted to take more action in real life, tended to donate less toward the cause. It might indicate that the more effort people put in reading and answering the questions, the less they were inclined to donate their hard-earned money.
 
 
-```{r, fig.width = 10, fig.height= 3, echo=FALSE, fig.cap="Relationship of Article Read Time and Donation to Quiz Score"}
-a <- ggplot(d, aes(x = as.factor(questions_correct), y = time_read_article, color = factor(treatment) )) + geom_boxplot() + ylab("Article Read Time (s)") +
+```{r, fig.width = 10, fig.height= 3, echo=FALSE, fig.cap="Relationship of Article Reading Time and Donation to Quiz Score"}
+a <- ggplot(d, aes(x = as.factor(questions_correct), y = time_read_article, color = factor(treatment) )) + geom_boxplot() + ylab("Article Reading Time (s)") +
   xlab("Quiz Score")+
   theme(
     panel.grid.major = element_blank(),
@@ -711,7 +711,7 @@ grid.arrange(a, b, ncol = 2)
 
 ```
 
-We asked the participants to rate the topic importance and article credibility on a scale of 1 to 7. On the right, credibility seems similar between treatment and control. On the left, treatment tends to assign higher importance ratings than control. According to the Wilcoxon rank-sum test, this difference in importance rating is statistically significant at the 0.05 level, in accordance with our hypothesis.
+We asked the participants to rate the topic importance and article credibility on a scale of 1 to 7 (Figure 13.) On the right, credibility seems similar between treatment and control. On the left, treatment tends to assign higher importance ratings than control. According to the Wilcoxon rank-sum test, this difference in importance rating is statistically significant at the 0.05 level, in accordance with our hypothesis.
 
 ```{r,fig.width = 10, fig.height= 3, echo=FALSE, fig.cap="Subjective Ratings on the Article and Its Topic"}
 plot1 <- ggplot(d, aes(x = importance, fill = factor(treatment))) +
@@ -753,9 +753,9 @@ wilcox.test(d$credibility[d$treatment == 0], d$credibility[d$treatment == 1])
 
 ## Compliance & Attrition
 
-We were surprised by how little time many of our respondents spent reading the article. We had anticipated a bell-curve distribution of article read times but, instead, observed a highly right-skewed distribution (shown below). The participants recruited through Mechanical Turk prefer to spend as little time on each task as possible and this preference is evident in their behaviors.
+We were surprised by how little time many of our respondents spent reading the article. We had anticipated a bell-curve distribution of article reading times but, instead, observed a highly right-skewed distribution (Figure 14). The participants recruited through Mechanical Turk prefer to spend as little time on each task as possible and this preference is evident in their behaviors.
 
-```{r,fig.width = 10, fig.height=4, echo=FALSE, fig.cap="Actual Distribution of Article Read Time"}
+```{r,fig.width = 10, fig.height=4, echo=FALSE, fig.cap="Actual Distribution of Article Reading Time"}
 d$treatment_factor <-as.factor(d$treatment)
 
 mean_control_time <- round(mean(d[d$treatment_factor == 0, time_read_article]), 2)
@@ -769,9 +769,9 @@ ggplot(d, aes(x = time_read_article, fill = treatment_factor)) +
   geom_vline(aes(xintercept = mean_treatment_time), color = "black", linetype = "dashed", size = 1) +
   annotate("text", x = mean_control_time - 20, y = 12, label = paste("Control mean: \n ", mean_control_time), color = "darkgreen", hjust="right") + 
   annotate("text", x = mean_treatment_time + 20, y = 12, label = paste("Treatment mean: \n ", mean_treatment_time), color = "black", hjust="left") + 
-  ggtitle("Histogram of Article Read Time (Seconds)") + geom_rug() + 
+  ggtitle("Histogram of Article Reading Time (Seconds)") + geom_rug() + 
   ylab("Frequency") +
-  xlab("Article Read Time (s)")+
+  xlab("Article Reading Time (s)")+
   theme(
     panel.grid.major = element_blank(),
     panel.grid.minor = element_blank(),
@@ -779,15 +779,14 @@ ggplot(d, aes(x = time_read_article, fill = treatment_factor)) +
     panel.background = element_blank())
 ```
 
-Although the participants who spend little time on the article are unlikely to have read it thoroughly, we decided not to filter based on these values. People vary their reading behaviors when they interact with journalistic writings in real life, such as skimming or only reading the first sentences. Therefore, we did not want to impose an arbitrary threshold on the article read time.
-Instead, we excluded those participants who took fewer than 100 seconds to answer the questions that followed the reading. We arrived at the threshold of 100 seconds by dividing the total number of words in the questions section (340 words) by an above-average reading speed of 200 words per minute. The result is a dataset of 111 observations, 61 in control and 50 in treatment.
-We had a large number of attritors after the Mechanical Turk task was filled. We believe that this attrited was comprised of another random sampling of the population we sampled while the task was active, thus we have excluded those incomplete responses from this analysis with the belief that the exclusion won't bias our results in any direction.
+Although the participants who spend little time on the article are unlikely to have read it thoroughly, we decided not to filter based on these values. People vary their reading behaviors when they interact with journalistic writings in real life, such as skimming or only reading the first sentences. Therefore, we did not want to impose an arbitrary threshold on the article reading time.
+Instead, we excluded those participants who took fewer than 100 seconds to answer the questions that followed the reading. We arrived at the threshold of 100 seconds by dividing the total number of words in the questions section (340 words) by a fast reading speed of 200 words per minute. The result is a dataset of 113 observations, 63 in control and 50 in treatment. We felt comfortable excluding observations by a reading time threshold, because treatment and control did not show a statistically significant difference in the article reading time. 
 And while we had high attrition, we believe that it affected both control and treatment groups equally as a result of random assignment. Therefore, we exclude the attritors from the analysis and believe that doing so will not bias our results. 
 
 ```{r, include=FALSE}
 d <- read_data()
 d <- d[time_answering_questions > 100, ]
-#(table(d$treatment))
+table(d$treatment)
 ```
 
 \pagebreak
@@ -813,13 +812,13 @@ stargazer(mod_1,mod_2,mod_3,
           title = "Comparing Treatment Effects",
           covariate.labels = c("Treatment"),
           omit = c("Constant", "Observations"),
-          dep.var.labels = c("Quiz Score", "Article Read Time (seconds)", "Donation in USD")
+          dep.var.labels = c("Quiz Score", "Article Reading Time (seconds)", "Donation in USD")
           )
 ```
 
-As shown, we observed a treatment effect of `r reg_q_correct[1]` with a p-value of `r reg_q_correct[2]` for the number of questions the survey taker answered correctly when treated. This hints that respondents who received the local (Los Angeles) article paid more attention to its contents and were able to recall information better on the quiz. Unfortunately, the same cannot be said about our Article Read Time outcome variable (ATE = `r reg_time_read_article[1]`, p=`r reg_time_read_article[2]`) or our Donation ammount outcome variable (ATE = `r reg_donation[1]`, p=`r reg_donation[2]`).
+As shown, we observed a treatment effect of `r reg_q_correct[1]` with a p-value of `r reg_q_correct[2]` for the number of questions the survey taker answered correctly when treated. This hints that respondents who received the local (Los Angeles) article paid more attention to its contents and were able to recall information better on the quiz. Unfortunately, the same cannot be said about our article reading time outcome variable (ATE = `r reg_time_read_article[1]`, p=`r reg_time_read_article[2]`) or our donation amount outcome variable (ATE = `r reg_donation[1]`, p=`r reg_donation[2]`).
 
-When considering the effect of treatment on the number of questions a respondent answered correctly, we wanted to make sure there were no unobserved confounds contributing to the effect. After running serveral analysis, the only significant covariate we found was Article read time. Taking Article Read Time into account yields the regression below.
+When considering the effect of treatment on the number of questions a respondent answered correctly, we wanted to make sure there were no unobserved confounds contributing to the effect. After running several analyses, the only significant covariate we found was the article reading time. Taking it into account yields the regression below.
 
 ```{r, echo=FALSE, results="asis"}
 mod_1 <- lm_with_rse(lm(questions_correct ~ treatment + time_read_article, data=d))
@@ -830,15 +829,15 @@ stargazer(mod_1,
           header = FALSE,
           #report = ("vc*p"),
           title = "Comparing Treatment Effects",
-          covariate.labels = c("Treatment", "Article Read Time (seconds)"),
+          covariate.labels = c("Treatment", "Article Reading Time (seconds)"),
           omit = c("Constant", "Observations"),
           dep.var.labels = c("Quiz Score")
 )
 ```
 
-The table does show a small effect of Article Read Time on the Quiz Score outcome variable, but the treatment effect is still there at `r round(mod_1$coefficients[[2]], 4)` and is still statistically significant at the 95% conficence level (p = `r round(anova(mod_1)$'Pr(>F)'[1], 4)`).
+Each additional second of article reading time increases the quiz score by 0.003 points, or 0.18 points per additional minute. Regardless of this addition, the treatment effect is still statistically significant at `r round(mod_1$coefficients[[2]], 4)` (p = `r round(anova(mod_1)$'Pr(>F)'[1], 4)`).
 
-We were not able to measure a statistically significant effect from either Article Time Read or Donation Ammount outcome variables. To see if we were asking the right questions, we created a binned catagory of Article Read Times for each minute and a dummy variable to represent whether or not the respondent donated. As you can see from the table below, the results are inconclusive. Log transformations of both did not help.
+We were not able to measure a statistically significant effect from either article reading time or donation amount outcome variables. To see if we were asking the right questions, we created a binned catagory of article reading times for each minute and a dummy variable to represent whether or not the respondent donated. As you can see from the table below, the results are inconclusive. Log transformations of both did not help.
 
 
 ```{r, echo=FALSE, results="asis"}
@@ -858,7 +857,7 @@ stargazer(mod_1, mod_2, mod_3,
           title = "Comparing Treatment Effects",
           covariate.labels = c("Treatment"),
           omit = c("Constant", "Observations"),
-          dep.var.labels = c("Article Read Time (1 Minute bins)", "Donation > 0 Dummy", "Log(Donation)")
+          dep.var.labels = c("Article Reading Time (1 Minute bins)", "Donation > 0 Dummy", "Log(Donation)")
 )
 ```
 
