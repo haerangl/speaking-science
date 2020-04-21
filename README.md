@@ -172,7 +172,7 @@ a subjective determination that the true distribution might look like
 the following.
 
 ![Quiz Score Assumed
-Distribution](Speaking_Science_report_files/figure-gfm/unnamed-chunk-3-1.png)
+Distribution](report/Speaking_Science_report_files/figure-gfm/unnamed-chunk-3-1.png)
 
 Assuming that the above represents the true distribution, the power
 analysis indicated that we would need at least 100 respondents to
@@ -180,7 +180,7 @@ achieve a power of 90%. *(Note: Due to the random nature, the minimum
 sample size may change, but it’s generally in the 100-120 range.)*
 
 ![Required Sample Size for Power - Quiz
-Score](Speaking_Science_report_files/figure-gfm/unnamed-chunk-5-1.png)
+Score](report/Speaking_Science_report_files/figure-gfm/unnamed-chunk-5-1.png)
 
 ### Donation as an Action
 
@@ -205,7 +205,7 @@ uncertain that we will have enough power to detect any real treatment
 effects in the donation amounts in this study.
 
 ![Power Analysis for
-Donations](Speaking_Science_report_files/figure-gfm/unnamed-chunk-6-1.png)
+Donations](report/Speaking_Science_report_files/figure-gfm/unnamed-chunk-6-1.png)
 
 ### Article Reading Time
 
@@ -222,7 +222,7 @@ study. As a result, we calculated that 100 observations is sufficient to
 achieve a power of 90%.
 
 ![Power Analysis for Read
-Time](Speaking_Science_report_files/figure-gfm/unnamed-chunk-11-1.png)
+Time](report/Speaking_Science_report_files/figure-gfm/unnamed-chunk-11-1.png)
 
 # Final Research Methodology
 
@@ -306,7 +306,7 @@ Figure 8. It is evident that some questions were more difficult than
 others.
 
 ![Question
-Difficulty](Speaking_Science_report_files/figure-gfm/unnamed-chunk-16-1.png)
+Difficulty](report/Speaking_Science_report_files/figure-gfm/unnamed-chunk-16-1.png)
 
 Figure 9 shows the histogram of the quiz scores, which resembles our
 assumed distribution at the power analysis steps, except that not a
@@ -315,7 +315,7 @@ The mean score of the treatment group was 2.76 and that of the control
 group was 2.33.
 
 ![Actual Distribution of Quiz
-Scores](Speaking_Science_report_files/figure-gfm/unnamed-chunk-18-1.png)
+Scores](report/Speaking_Science_report_files/figure-gfm/unnamed-chunk-18-1.png)
 
 The distribution of the article reading time, Figure 10, revealed that
 our assumption of normal distribution was incorrect. Although the
@@ -326,7 +326,7 @@ treatment and control is only 10 seconds, as opposed to 70 seconds we
 thought we would see.
 
 ![Actual Distribution of Article Reading
-Time](Speaking_Science_report_files/figure-gfm/unnamed-chunk-19-1.png)
+Time](report/Speaking_Science_report_files/figure-gfm/unnamed-chunk-19-1.png)
 
 The actual distribution of donation amounts, Figure 11, seems to have a
 much smaller treatment effect than either one of our assumed
@@ -336,7 +336,7 @@ this distribution seems to indicate even smaller (if any) treatment
 effect, we are doubtful we will detect any treatment effects here.
 
 ![Actual Distribution of
-Donation](Speaking_Science_report_files/figure-gfm/unnamed-chunk-20-1.png)
+Donation](report/Speaking_Science_report_files/figure-gfm/unnamed-chunk-20-1.png)
 
 We examined the distribution of article reading time (Figure 12, left)
 and donation amount (Figure 12, right) per quiz score. Unsurprisingly,
@@ -348,7 +348,7 @@ people put in reading and answering the questions, the less they were
 inclined to donate their hard-earned money.
 
 ![Relationship of Article Reading Time and Donation to Quiz
-Score](Speaking_Science_report_files/figure-gfm/unnamed-chunk-21-1.png)
+Score](report/Speaking_Science_report_files/figure-gfm/unnamed-chunk-21-1.png)
 
 We asked the participants to rate the topic importance and article
 credibility on a scale of 1 to 7 (Figure 13.) On the right, credibility
@@ -359,7 +359,7 @@ statistically significant at the 0.05 level, in accordance with our
 hypothesis.
 
 ![Subjective Ratings on the Article and Its
-Topic](Speaking_Science_report_files/figure-gfm/unnamed-chunk-22-1.png)
+Topic](report/Speaking_Science_report_files/figure-gfm/unnamed-chunk-22-1.png)
 
     ## 
     ##  Wilcoxon rank sum test with continuity correction
@@ -387,7 +387,7 @@ Turk prefer to spend as little time on each task as possible and this
 preference is evident in their behaviors.
 
 ![Actual Distribution of Article Reading
-Time](Speaking_Science_report_files/figure-gfm/unnamed-chunk-24-1.png)
+Time](report/Speaking_Science_report_files/figure-gfm/unnamed-chunk-24-1.png)
 
 Although the participants who spend little time on the article are
 unlikely to have read it thoroughly, we decided not to filter based on
