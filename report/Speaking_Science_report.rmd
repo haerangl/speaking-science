@@ -741,7 +741,7 @@ wilcox.test(d$credibility[d$treatment == 0], d$credibility[d$treatment == 1])
 
 ## Compliance & Attrition
 
-A surprising finding of our survey was how little time was spent reading the article. We had initially anticipated a normal or normal-esque shaped distribution of reading times around the 2 minute mark. Instead, we observed a highly right-skewed distribution (shown below) of article read times. This is likely an artifact of conducting our survey on Mechanical Turk; we discuss this in more detail later on. 
+We were surprised by how little time many of our respondents spent reading the article. We had anticipated a bell-curve distribution of reading times but, instead, observed a highly right-skewed distribution (shown below). The participants recruited through Mechanical Turk prefer to spend as little time on each task as possible and this preference is evident in their behaviors.
 
 ```{r, echo=FALSE}
 d$treatment_factor <-as.factor(d$treatment)
@@ -767,7 +767,10 @@ ggplot(d, aes(x = time_read_article, fill = treatment_factor)) +
     panel.background = element_blank())
 ```
 
-For our final analysis, we've opted to keep all reading times and not include observations for those who took fewer than 100 seconds to complete the questions portions of the survey. This is based on a question section length of 340 words and a read and answer composite time of 200 words per minute. The result is a dataset of 111 observations, 61 in control and 50 in treatment. We decided not to filter any of the Article Read Time values because our survey had forced people to stay on the page for 15 seconds. Furthermore, we believe that applying a words read per minute threshold might not be an accurate model of how people interact with journalistic writings, especially those that are scientifically oriented. We had a large number of attritors after the Mechanical Turk task was filled. We believe that this attrited was comprised of another random sampling of the population we sampled while the task was active, thus we have excluded those incomplete responses from this analysis with the belief that the exclusion won't bias our results in any direction.  
+Although the participants who spend little time on the article are unlikely to have read it thoroughly, we decided not to filter based on these values. People vary their reading behaviors when they interact with journalistic writings in real life, such as skimming or only reading the first sentences. Therefore, we did not want to impose an arbitrary threshold on the reading time.
+Instead, we excluded those participants who took fewer than 100 seconds to answer the questions that followed the reading. We arrived at the threshold of 100 seconds by dividing the total number of words in the questions section (340 words) by an above-average reading speed of 200 words per minute. The result is a dataset of 111 observations, 61 in control and 50 in treatment.
+We had a large number of attritors after the Mechanical Turk task was filled. We believe that this attrited was comprised of another random sampling of the population we sampled while the task was active, thus we have excluded those incomplete responses from this analysis with the belief that the exclusion won't bias our results in any direction.
+And while we had high attrition, we believe that it affected both control and treatment groups equally as a result of random assignment. Therefore, we exclude the attritors from the analysis and believe that doing so will not bias our results. 
 
 ```{r, include=FALSE}
 # d <- read_data()
@@ -814,7 +817,7 @@ stargazer(mod_1,
 
 The table does show a small effect of Article Read Time on the Questions Correct outcome variable, but the treatment effect is still there at `r round(mod_1$coefficients[[2]], 4)` and is still statistically significant at the 95% conficence level (p = `r round(anova(mod_1)$'Pr(>F)'[1], 4)`).
 
-We were not able to measure a statistically signigcant effect from either Article Time Read or Donation Ammount outcome variables. To see if we were asking the right questions, we created a binned catagory of Article Read Times for each minute and a dummy variable to represent whether or not the respondent donated. As you can see from the table below, the results are inconclusive. Log transformations of both did not help.
+We were not able to measure a statistically significant effect from either Article Time Read or Donation Ammount outcome variables. To see if we were asking the right questions, we created a binned catagory of Article Read Times for each minute and a dummy variable to represent whether or not the respondent donated. As you can see from the table below, the results are inconclusive. Log transformations of both did not help.
 
 ```{r, echo=FALSE, results="asis"}
 d$donator <- ifelse(d$donation > 0, 1, 0)
@@ -838,16 +841,16 @@ stargazer(mod_1, mod_2,
 
 # Generalizability Concerns
 
-We would like to believe that the observed results of our research are true; that people care more about articles if they have a personal stake in the ramifications presented in them, there are a few caveats worth mentioning about how generalizable our results are.
+We would like to believe that the observed results of our research are true; that people pay closer attention if they have a personal stake in the ramifications presented in a science article. However, there are a few caveats worth mentioning about the generalizability of our results.
 
 ## Science Communication Field 
 
-As discussed, the article that we chose focused on cargo ships and their effect on air pollution near the Port of Los Angeles. This is very much a niche topic in the world of science communications. As such, it can not be reasonably stated that the article represents the breadth of topics under the science communication umbrella. Journalistic scientific communication is published every day on topics of climate change, medicine, technology, space exploration, anthropology, and much more. Different science fields might benefit from different communication styles.
+The article used in the study focused on a specific topic of cargo ships and their effect on air pollution near the ports. We cannot argue that the topic represents the breadth of the general science communication. Every day, journals publish articles on myriad topics, including climate change, medicine, technology, space exploration, anthropology, and more. Engagement in different fields might benefit from different styles or variables.
 Moreover, there is no reason to believe that localizing articles of every scientific field would yield benefits. The article itself was concrete and commanded an air of certainty around the topic. Other, similar, articles may be written in more abstract or hypothetical terms. 
 
 ## Comprehension is Difficult to Quantify
 
-What does it mean to understand an article? We struggled with this question a significant amount while designing our experiment. Although it's great that most of our survey respondents were able to answer knowledge questions about the contents of the article, does that mean they understand the article's complete implications? Or does it mean they retained the explicitly stated ramifications? Moreover, is any of this knowledge retained?   
+What does it mean to understand an article? We struggled with this question while designing our experiment. Although it's great that most of our survey respondents were able to answer knowledge questions about the contents of the article, does that mean they understand the article's complete implications? Or does it mean they retained the explicitly stated ramifications? Moreover, is any of this knowledge retained?   
 Aside from metacognition concerns, our questions followed no standard for testing knowledge simply because there isn't one. Science communication outcomes and goals are still hotly debated by experts in the fields. While we're comfortable saying that some of our users probably understood the article better than others, the number of questions answered correctly on a survey is still an imperfect proxy for quantifying how well knowledge was absorbed. 
 
 ## Competing Incentives with Mechanical Turk
