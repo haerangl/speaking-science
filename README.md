@@ -239,7 +239,7 @@ treatment or control, then given a series of questions.
 
 <div class="figure">
 
-<img src="resources/surveyflow.png" alt="Survey Flow" width="100%" />
+<img src="report/resources/surveyflow.png" alt="Survey Flow" width="100%" />
 
 <p class="caption">
 
@@ -267,7 +267,7 @@ other article and they do not cheat on the questions.
 
 <div class="figure">
 
-<img src="resources/roxy.png" alt="Treatment and Randomization" width="35%" />
+<img src="report/resources/roxy.png" alt="Treatment and Randomization" width="35%" />
 
 <p class="caption">
 
@@ -289,7 +289,7 @@ control. See graphical representation of survey participants below.
 
 <div class="figure">
 
-<img src="resources/sankey_diagram.jpg" alt="Sankey Diagram of survey data" width="100%" />
+<img src="report/resources/sankey_diagram.jpg" alt="Sankey Diagram of survey data" width="100%" />
 
 <p class="caption">
 
