@@ -543,8 +543,8 @@ In order to ensure a high quality response, we have communicated to the survey t
 
 
 ```{r, include=FALSE}
-# Import data
 
+# Import data functions
 read_data <- function(data_file) {
   if(missing(data_file)) {
     data_file <- '../data/speaking_science_data_03-24_clean.csv'
@@ -559,6 +559,11 @@ read_data <- function(data_file) {
 
   return(d)
 }
+
+lm_with_rse <- function(mod) {
+  mod$rse <- sqrt(diag(vcovHC(mod)))
+  return(mod)
+}
 ```
 
 
@@ -569,7 +574,6 @@ A total of 264 people clicked on our survey on Mechanical Turk. 64 people did no
 
 ```{r pressure, echo=FALSE, fig.cap="Sankey Diagram of survey data", out.width = '100%'}
 knitr::include_graphics("resources/sankey_diagram.jpg")
-
 ```
 
 ```{r include=FALSE}
@@ -743,7 +747,7 @@ wilcox.test(d$credibility[d$treatment == 0], d$credibility[d$treatment == 1])
 
 We were surprised by how little time many of our respondents spent reading the article. We had anticipated a bell-curve distribution of reading times but, instead, observed a highly right-skewed distribution (shown below). The participants recruited through Mechanical Turk prefer to spend as little time on each task as possible and this preference is evident in their behaviors.
 
-```{r, echo=FALSE}
+```{r,fig.width = 10, fig.height=4, echo=FALSE}
 d$treatment_factor <-as.factor(d$treatment)
 
 mean_control_time <- round(mean(d[d$treatment_factor == 0, time_read_article]), 2)
@@ -772,21 +776,22 @@ Instead, we excluded those participants who took fewer than 100 seconds to answe
 We had a large number of attritors after the Mechanical Turk task was filled. We believe that this attrited was comprised of another random sampling of the population we sampled while the task was active, thus we have excluded those incomplete responses from this analysis with the belief that the exclusion won't bias our results in any direction.
 And while we had high attrition, we believe that it affected both control and treatment groups equally as a result of random assignment. Therefore, we exclude the attritors from the analysis and believe that doing so will not bias our results. 
 
-```{r, include=FALSE}
-# d <- read_data()
+```{r, echo=FALSE}
+d <- read_data()
 d <- d[time_answering_questions > 100, ]
-(table(d$treatment))
+#(table(d$treatment))
 ```
 
 ## Regression Results
 A simple regression of our three outcome variables yields the following table.
 
 ```{r, echo=FALSE, results="asis"}
-mod_1 <- lm(questions_correct ~ treatment, data=d)
-mod_2 <- lm(time_read_article ~ treatment, data=d)
-mod_3 <- lm(donation ~ treatment, data=d)
+mod_1 <- lm_with_rse(lm(questions_correct ~ treatment, data=d))
+mod_2 <- lm_with_rse(lm(time_read_article ~ treatment, data=d))
+mod_3 <- lm_with_rse(lm(donation ~ treatment, data=d))
 
 stargazer(mod_1,mod_2,mod_3,
+          se = list(mod_1$rse, mod_2$rse, mod_3$rse),
           #type="text", # comment out when knitting
           header = FALSE,
           report = ("vc*p"),
@@ -802,9 +807,10 @@ As shown, we observed a treatment effect of `r round(mod_1$coefficients[[2]], 4)
 When considering the effect of treatment on the number of questions a respondent answered correctly, we wanted to make sure there were no unobserved confounds contributing to the effect. After running serveral analysis, the only significant covariate we found was Article read time. Taking Article Read Time into account yields the regression below.
 
 ```{r, echo=FALSE, results="asis"}
-mod_1 <- lm(questions_correct ~ treatment + time_read_article, data=d)
+mod_1 <- lm_with_rse(lm(questions_correct ~ treatment + time_read_article, data=d))
 
 stargazer(mod_1,
+          se = list(mod_1$rse),
           #type="text", # comment out when knitting
           header = FALSE,
           report = ("vc*p"),
@@ -823,10 +829,11 @@ We were not able to measure a statistically significant effect from either Artic
 d$donator <- ifelse(d$donation > 0, 1, 0)
 d$time_read_article_bins <- d$time_read_article %/% 60
 
-mod_1 <- lm(time_read_article_bins ~ treatment, data=d)
-mod_2 <- lm(donator ~ treatment, data=d)
+mod_1 <- lm_with_rse(lm(time_read_article_bins ~ treatment, data=d))
+mod_2 <- lm_with_rse(lm(donator ~ treatment, data=d))
 
 stargazer(mod_1, mod_2,
+          se = list(mod_1$rse, mod_2$rse),
           #type="text", # comment out when knitting
           header = FALSE,
           #report = ("vc*p"),
